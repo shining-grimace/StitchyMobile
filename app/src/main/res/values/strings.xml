@@ -16,5 +16,6 @@
 
     <!-- Accessibility -->
     <string name="acc_stitch_preview">Preview of stitch result</string>
+    <string name="acc_selected_image">Selected image</string>
 
 </resources>
