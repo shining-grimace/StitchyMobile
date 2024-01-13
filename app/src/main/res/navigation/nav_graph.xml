@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/MainFragment"
-        android:name="com.shininggrimace.stitchy.MainFragment"
+        android:name="com.shininggrimace.stitchy.fragment.MainFragment"
         android:label="@string/main_fragment_label"
         tools:layout="@layout/fragment_main">
 
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="com.shininggrimace.stitchy.SettingsFragment"
+        android:name="com.shininggrimace.stitchy.fragment.SettingsFragment"
         android:label="@string/settings_fragment_label"
         tools:layout="@layout/fragment_settings">
 

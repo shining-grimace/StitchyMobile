@@ -1,4 +1,4 @@
-package com.shininggrimace.stitchy.holders
+package com.shininggrimace.stitchy.holder
 
 import android.net.Uri
 import android.view.View

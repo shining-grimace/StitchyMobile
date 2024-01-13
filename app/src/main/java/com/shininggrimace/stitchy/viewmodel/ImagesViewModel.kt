@@ -1,4 +1,4 @@
-package com.shininggrimace.stitchy.viewmodels
+package com.shininggrimace.stitchy.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel

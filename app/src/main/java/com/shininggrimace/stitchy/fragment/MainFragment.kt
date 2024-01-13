@@ -1,4 +1,4 @@
-package com.shininggrimace.stitchy
+package com.shininggrimace.stitchy.fragment
 
 import android.net.Uri
 import android.os.Bundle
@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.shininggrimace.stitchy.adapters.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
-import com.shininggrimace.stitchy.viewmodels.ImagesViewModel
+import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.launch
 
 /**

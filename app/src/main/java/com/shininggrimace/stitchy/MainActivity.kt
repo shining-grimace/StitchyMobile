@@ -14,7 +14,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
-import com.shininggrimace.stitchy.viewmodels.ImagesViewModel
+import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 
 class MainActivity : AppCompatActivity() {
 

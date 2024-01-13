@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.shininggrimace.stitchy.R
-import com.shininggrimace.stitchy.holders.ImageViewHolder
+import com.shininggrimace.stitchy.holder.ImageViewHolder
 
 class ImageAdapter(
     private val images: List<Uri>

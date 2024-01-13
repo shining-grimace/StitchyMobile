@@ -1,4 +1,4 @@
-package com.shininggrimace.stitchy
+package com.shininggrimace.stitchy.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment() {
