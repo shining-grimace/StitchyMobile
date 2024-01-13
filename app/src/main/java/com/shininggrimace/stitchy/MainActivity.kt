@@ -2,7 +2,6 @@ package com.shininggrimace.stitchy
 
 import android.net.Uri
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,20 +10,18 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.navigation.fragment.findNavController
+import androidx.activity.viewModels
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
-import kotlinx.coroutines.CancellableContinuation
-import kotlin.coroutines.resume
+import com.shininggrimace.stitchy.viewmodels.ImagesViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
-    private var imageSelectionContinuation: CancellableContinuation<Uri>? = null
-
-    private lateinit var pickImage: ActivityResultLauncher<String>
+    private lateinit var pickImages: ActivityResultLauncher<PickVisualMediaRequest>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,13 +29,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            when (uri) {
-                null -> imageSelectionContinuation?.cancel(null)
-                else -> imageSelectionContinuation?.resume(uri)
+        val viewModel: ImagesViewModel by viewModels()
+        pickImages = registerForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+                viewModel.imageSelections.tryEmit(uris)
             }
-            imageSelectionContinuation = null
-        }
 
         setSupportActionBar(binding.toolbar)
 
@@ -46,10 +41,9 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar
-                .make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        binding.fab.setOnClickListener {
+            pickImages.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
     }
 
@@ -61,9 +55,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                supportFragmentManager.primaryNavigationFragment
-                    ?.findNavController()
-                    ?.navigate(R.id.action_MainFragment_to_SettingsFragment)
+                findNavController(R.id.nav_host_fragment_content_main)
+                    .navigate(R.id.action_MainFragment_to_SettingsFragment)
                 true
             }
             else -> super.onOptionsItemSelected(item)
