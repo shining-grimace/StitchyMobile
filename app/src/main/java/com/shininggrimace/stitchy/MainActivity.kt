@@ -1,6 +1,5 @@
 package com.shininggrimace.stitchy
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -23,6 +22,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pickImages: ActivityResultLauncher<PickVisualMediaRequest>
 
+    init {
+        // Load librust.so
+        System.loadLibrary("rust")
+    }
+
+    companion object {
+        @JvmStatic
+        external fun runStitchy(uri: String)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,6 +42,9 @@ class MainActivity : AppCompatActivity() {
         pickImages = registerForActivityResult(
             ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
                 viewModel.imageSelections.tryEmit(uris)
+                if (uris.size == 1) {
+                    runStitchy(uris[0].toString())
+                }
             }
 
         setSupportActionBar(binding.toolbar)
@@ -67,9 +79,5 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-
-    suspend fun processImages(): Result<Uri> {
-        TODO("Process images")
     }
 }

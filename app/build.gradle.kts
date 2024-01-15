@@ -47,3 +47,19 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
+
+tasks.register<Exec>("compileRust") {
+    commandLine("cargo", "build", "--target", "aarch64-linux-android", "--release", "--manifest-path", "../rust/Cargo.toml")
+
+    doLast {
+        project.copy {
+            from("../rust/target/aarch64-linux-android/release/librust.so")
+            into("src/main/jniLibs/arm64-v8a")
+        }
+        println("Rust compiler completed")
+    }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn("compileRust")
+}
