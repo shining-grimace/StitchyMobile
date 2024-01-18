@@ -1,5 +1,6 @@
 package com.shininggrimace.stitchy
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -8,12 +9,16 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,8 +34,45 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         @JvmStatic
-        external fun runStitchy(uri: String)
+        external fun runStitchy(uris: IntArray): String
     }
+
+    private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->
+        val viewModel: ImagesViewModel by viewModels()
+        viewModel.imageSelections.tryEmit(uris)
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.outputState.tryEmit(Pair(
+                ImagesViewModel.OutputState.Loading,
+                Unit))
+            val inputFilesResult = tryOpenInputFiles(uris)
+            inputFilesResult.getOrNull()?.let { fds ->
+                val message = runStitchy(fds)
+                viewModel.outputState.tryEmit(Pair(
+                    ImagesViewModel.OutputState.Completed,
+                    message))
+            } ?: run {
+                viewModel.outputState.tryEmit(Pair(
+                    ImagesViewModel.OutputState.Failed,
+                    inputFilesResult.exceptionOrNull() ?: Unit))
+            }
+        }
+
+    }
+
+    private fun tryOpenInputFiles(uris: List<Uri>): Result<IntArray> =
+        try {
+            val fds = uris
+                .map { uri ->
+                    contentResolver
+                        .openFileDescriptor(uri, "r")
+                        ?.detachFd()
+                        ?: throw Exception("Error opening an input file")
+                }
+                .toIntArray()
+            Result.success(fds)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,14 +80,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val viewModel: ImagesViewModel by viewModels()
         pickImages = registerForActivityResult(
-            ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
-                viewModel.imageSelections.tryEmit(uris)
-                if (uris.size == 1) {
-                    runStitchy(uris[0].toString())
-                }
-            }
+            ActivityResultContracts.PickMultipleVisualMedia(),
+            onInputsSelected)
 
         setSupportActionBar(binding.toolbar)
 

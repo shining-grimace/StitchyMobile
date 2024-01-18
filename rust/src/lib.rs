@@ -1,11 +1,11 @@
 
-use jni::{JNIEnv, objects::{JClass, JObject, JValue, JString}};
-use std::ffi::CStr;
+use jni::{JNIEnv, objects::{JClass, JObject, JValue, JString, JIntArray, ReleaseMode}, sys::jstring};
+use std::{fs::File, os::fd::FromRawFd};
 
 #[derive(Debug)]
 enum Error {
     Jni(jni::errors::Error),
-    Unknown(String)
+    Io(std::io::Error)
 }
 
 impl From<jni::errors::Error> for Error {
@@ -14,15 +14,24 @@ impl From<jni::errors::Error> for Error {
     }
 }
 
+impl From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Error::Io(value)
+    }
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn Java_com_shininggrimace_stitchy_MainActivity_runStitchy(
     mut env: JNIEnv,
     _: JClass,
-    uri: JString
-) {
-    if let Err(e) = process_image(&mut env, uri) {
-        println!("Error logging message: {:?}", e);
+    input_fds: JIntArray
+) -> jstring {
+    let message = match process_images(&mut env, input_fds) {
+        Ok(()) => "Files processed".to_owned(),
+        Err(Error::Jni(e)) => format!("JNI error: {:?}", e),
+        Err(Error::Io(e)) => format!("IO error: {:?}", e)
     };
+    env.new_string(message).unwrap_or(JString::default()).into_raw()
 }
 
 fn log_message(
@@ -39,13 +48,16 @@ fn log_message(
     Ok(())
 }
 
-fn process_image(
+fn process_images(
     env: &mut JNIEnv,
-    uri: JString
+    input_fds: JIntArray
 ) -> Result<(), Error> {
-    let uri_ptr = env.get_string(&uri)?.as_ptr();
-    let uri_cstr = unsafe { CStr::from_ptr(uri_ptr) };
-    let uri_str = uri_cstr.to_str().unwrap();
-    log_message(env, uri_str)?;
+    let fds = unsafe { env.get_array_elements(&input_fds, ReleaseMode::NoCopyBack)? };
+    for fd in fds.into_iter() {
+        let file = unsafe { File::from_raw_fd(*fd) };
+        let metadata = file.metadata()?;
+        let message = format!("File size: {}", metadata.len());
+        log_message(env, &message)?;
+    }
     Ok(())
 }

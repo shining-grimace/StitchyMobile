@@ -14,6 +14,9 @@
     <!-- Descriptions -->
     <string name="no_images_selected">No images selected</string>
 
+    <!-- Messages -->
+    <string name="no_message_generated">Internal error - nothing to display</string>
+
     <!-- Accessibility -->
     <string name="acc_stitch_preview">Preview of stitch result</string>
     <string name="acc_selected_image">Selected image</string>
