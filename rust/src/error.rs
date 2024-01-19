@@ -2,7 +2,8 @@
 #[derive(Debug)]
 pub enum Error {
     Jni(jni::errors::Error),
-    Io(std::io::Error)
+    Io(std::io::Error),
+    Unknown(String)
 }
 
 impl From<jni::errors::Error> for Error {

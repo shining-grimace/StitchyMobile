@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
+import com.shininggrimace.stitchy.util.TypedFileDescriptors
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         @JvmStatic
-        external fun runStitchy(uris: IntArray): String
+        external fun runStitchy(inputFds: IntArray, inputMimeTypes: Array<String>): String
     }
 
     private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->
@@ -44,9 +45,9 @@ class MainActivity : AppCompatActivity() {
             viewModel.outputState.tryEmit(Pair(
                 ImagesViewModel.OutputState.Loading,
                 Unit))
-            val inputFilesResult = tryOpenInputFiles(uris)
-            inputFilesResult.getOrNull()?.let { fds ->
-                val message = runStitchy(fds)
+            val inputFilesResult = TypedFileDescriptors.fromPaths(this@MainActivity, uris)
+            inputFilesResult.getOrNull()?.let { typedFiles ->
+                val message = runStitchy(typedFiles.fileFds, typedFiles.mimeTypes)
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Completed,
                     message))
@@ -56,23 +57,7 @@ class MainActivity : AppCompatActivity() {
                     inputFilesResult.exceptionOrNull() ?: Unit))
             }
         }
-
     }
-
-    private fun tryOpenInputFiles(uris: List<Uri>): Result<IntArray> =
-        try {
-            val fds = uris
-                .map { uri ->
-                    contentResolver
-                        .openFileDescriptor(uri, "r")
-                        ?.detachFd()
-                        ?: throw Exception("Error opening an input file")
-                }
-                .toIntArray()
-            Result.success(fds)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
