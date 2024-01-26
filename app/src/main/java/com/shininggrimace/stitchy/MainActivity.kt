@@ -2,6 +2,7 @@ package com.shininggrimace.stitchy
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +21,7 @@ import com.shininggrimace.stitchy.util.TypedFileDescriptors
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,27 +37,72 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         @JvmStatic
-        external fun runStitchy(inputFds: IntArray, inputMimeTypes: Array<String>): String
+        external fun runStitchy(
+            inputFds: IntArray,
+            inputMimeTypes: Array<String>,
+            outputFd: Int,
+            outputMimeType: String
+        ): String?
     }
 
     private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->
         val viewModel: ImagesViewModel by viewModels()
         viewModel.imageSelections.tryEmit(uris)
         lifecycleScope.launch(Dispatchers.IO) {
+
+            // Mark loading
             viewModel.outputState.tryEmit(Pair(
                 ImagesViewModel.OutputState.Loading,
                 Unit))
+
+            // Open input files
             val inputFilesResult = TypedFileDescriptors.fromPaths(this@MainActivity, uris)
-            inputFilesResult.getOrNull()?.let { typedFiles ->
-                val message = runStitchy(typedFiles.fileFds, typedFiles.mimeTypes)
-                viewModel.outputState.tryEmit(Pair(
-                    ImagesViewModel.OutputState.Completed,
-                    message))
-            } ?: run {
+            inputFilesResult.onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
                     inputFilesResult.exceptionOrNull() ?: Unit))
+                return@launch
             }
+
+            // Get output file including MIME type
+            val outputFile = File.createTempFile("stitch_preview", ".png", cacheDir)
+            val outputFdResult = getRawFileDescriptor(outputFile)
+            outputFdResult.onFailure {
+                viewModel.outputState.tryEmit(Pair(
+                    ImagesViewModel.OutputState.Failed,
+                    Exception("Cannot open output file")))
+                return@launch
+            }
+            val outputFd = outputFdResult.getOrThrow()
+
+            // Run Stitchy
+            val inputFds = inputFilesResult.getOrThrow()
+            val errorMessage = runStitchy(
+                inputFds.fileFds,
+                inputFds.mimeTypes,
+                outputFd,
+                "image/png"
+            ) ?: run {
+                viewModel.outputState.tryEmit(Pair(
+                    ImagesViewModel.OutputState.Completed,
+                    outputFile.absolutePath))
+                return@launch
+            }
+
+            // Update UI as completed
+            viewModel.outputState.tryEmit(Pair(
+                ImagesViewModel.OutputState.Failed,
+                Exception(errorMessage)))
+        }
+    }
+
+    private fun getRawFileDescriptor(file: File): Result<Int> {
+        return try {
+            file.createNewFile()
+            val pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE)
+            Result.success(pfd.detachFd())
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

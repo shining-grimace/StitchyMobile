@@ -1,8 +1,8 @@
 package com.shininggrimace.stitchy.fragment
 
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -71,22 +71,29 @@ class MainFragment : Fragment() {
             ImagesViewModel.OutputState.Empty -> {
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
+                binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.setText(R.string.no_images_selected)
             }
             ImagesViewModel.OutputState.Loading -> {
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
+                binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.setText(R.string.no_images_selected)
             }
             ImagesViewModel.OutputState.Completed -> {
                 binding.outputLoading.visibility = View.GONE
-                binding.outputLabel.visibility = View.VISIBLE
-                binding.outputLabel.text = (payload as? String)
-                    ?: getString(R.string.no_message_generated)
+                binding.outputLabel.visibility = View.GONE
+                binding.stitchPreview.visibility = View.VISIBLE
+                (payload as? String)?.let { file ->
+                    binding.stitchPreview.setImageBitmap(
+                        BitmapFactory.decodeFile(file)
+                    )
+                }
             }
             ImagesViewModel.OutputState.Failed -> {
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
+                binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.text = (payload as? Exception)?.message
                     ?: getString(R.string.no_message_generated)
             }
