@@ -2,6 +2,7 @@ package com.shininggrimace.stitchy.util
 
 import android.content.Context
 import android.net.Uri
+import com.shininggrimace.stitchy.MainActivity
 
 class TypedFileDescriptors private constructor(
     val fileFds: IntArray,
@@ -24,7 +25,8 @@ class TypedFileDescriptors private constructor(
                     mimes.add(mime)
                 }
             } catch (e: Exception) {
-                return Result.failure(e)
+                MainActivity.logException(e)
+                return Result.failure(Exception("Cannot open selected files"))
             }
 
             return Result.success(

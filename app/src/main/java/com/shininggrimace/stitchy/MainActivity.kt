@@ -2,6 +2,7 @@ package com.shininggrimace.stitchy
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity(), ImageFiles {
     }
 
     companion object {
+
         @JvmStatic
         external fun runStitchy(
             config: String,
@@ -39,6 +41,10 @@ class MainActivity : AppCompatActivity(), ImageFiles {
             outputFd: Int,
             outputMimeType: String
         ): String?
+
+        fun logException(e: Exception) {
+            Log.e("StitchyMobile", e.message ?: "(Unknown exception)")
+        }
     }
 
     private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->

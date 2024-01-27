@@ -42,7 +42,7 @@ interface ImageFiles {
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
-                    Exception("Cannot open output file")))
+                    it))
                 return@launch
             }
             .getOrThrow()
@@ -53,7 +53,7 @@ interface ImageFiles {
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
-                    Exception("Cannot convert options to JSON")))
+                    it))
                 return@launch
             }
             .getOrThrow()
@@ -84,7 +84,8 @@ interface ImageFiles {
             val pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE)
             Result.success(pfd.detachFd())
         } catch (e: Exception) {
-            Result.failure(e)
+            MainActivity.logException(e)
+            Result.failure(Exception("Cannot open output file"))
         }
     }
 }

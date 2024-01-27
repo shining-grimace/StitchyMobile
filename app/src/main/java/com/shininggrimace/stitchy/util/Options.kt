@@ -1,5 +1,6 @@
 package com.shininggrimace.stitchy.util
 
+import com.shininggrimace.stitchy.MainActivity
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
@@ -32,6 +33,7 @@ data class Options(
                 .toJson(this)
             Result.success(json)
         } catch (e: Exception) {
+            MainActivity.logException(e)
             Result.failure(Exception("Error converting options to JSON"))
         }
     }
