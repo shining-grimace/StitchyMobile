@@ -2,6 +2,7 @@
 
     <string name="app_name">Stitchy Mobile</string>
     <string name="action_settings">Settings</string>
+    <string name="action_save">Save</string>
 
     <!-- Labels -->
     <string name="main_fragment_label">Stitchy</string>

@@ -5,10 +5,16 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.adapters.ImageAdapter
@@ -20,7 +26,7 @@ import java.lang.Exception
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), MenuProvider {
 
     private var _binding: FragmentMainBinding? = null
 
@@ -30,6 +36,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        (activity as? MenuHost)?.addMenuProvider(this)
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         val viewModel: ImagesViewModel by activityViewModels()
         lifecycleScope.launch {
@@ -55,9 +62,25 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menu.clear()
+        menuInflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
+            R.id.action_settings -> {
+                findNavController()
+                    .navigate(R.id.action_MainFragment_to_SettingsFragment)
+                true
+            }
+            else -> false
+        }
+    }
+
     private fun showImageSelections(images: List<Uri>) {
         val context = context ?: return
-        if (images.size > 0) {
+        if (images.isNotEmpty()) {
             binding.selectedFiles.visibility = View.VISIBLE
             binding.selectedFiles.layoutManager = GridLayoutManager(context, 2)
             binding.selectedFiles.adapter = ImageAdapter(images)

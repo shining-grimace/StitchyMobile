@@ -5,10 +5,10 @@
     tools:context="com.shininggrimace.stitchy.MainActivity">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_save"
         android:orderInCategory="100"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/action_settings"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/action_save"
         app:showAsAction="ifRoom" />
 
 </menu>
