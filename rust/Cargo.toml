@@ -9,3 +9,5 @@ crate-type = ["dylib"]
 [dependencies]
 stitchy-core = { path = "../../Stitchy/crates/stitchy-core", features = ["parser"] }
 jni = { version = "0.21.1", default-features = false }
+serde = { version = "1.0.155", features = ["derive"] }
+serde_json = { version = "1.0.94" }

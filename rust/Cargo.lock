@@ -270,6 +270,8 @@ name = "rust"
 version = "0.1.0"
 dependencies = [
  "jni",
+ "serde",
+ "serde_json",
  "stitchy-core",
 ]
 

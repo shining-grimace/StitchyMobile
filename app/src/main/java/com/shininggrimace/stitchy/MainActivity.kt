@@ -17,6 +17,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
+import com.shininggrimace.stitchy.util.Options
+import com.shininggrimace.stitchy.util.OptionsRepository
 import com.shininggrimace.stitchy.util.TypedFileDescriptors
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         @JvmStatic
         external fun runStitchy(
+            config: String,
             inputFds: IntArray,
             inputMimeTypes: Array<String>,
             outputFd: Int,
@@ -56,28 +59,40 @@ class MainActivity : AppCompatActivity() {
                 Unit))
 
             // Open input files
-            val inputFilesResult = TypedFileDescriptors.fromPaths(this@MainActivity, uris)
-            inputFilesResult.onFailure {
-                viewModel.outputState.tryEmit(Pair(
-                    ImagesViewModel.OutputState.Failed,
-                    inputFilesResult.exceptionOrNull() ?: Unit))
-                return@launch
-            }
+            val inputFds = TypedFileDescriptors.fromPaths(this@MainActivity, uris)
+                .onFailure {
+                    viewModel.outputState.tryEmit(Pair(
+                        ImagesViewModel.OutputState.Failed,
+                        it))
+                    return@launch
+                }
+                .getOrThrow()
 
             // Get output file including MIME type
             val outputFile = File.createTempFile("stitch_preview", ".png", cacheDir)
-            val outputFdResult = getRawFileDescriptor(outputFile)
-            outputFdResult.onFailure {
-                viewModel.outputState.tryEmit(Pair(
-                    ImagesViewModel.OutputState.Failed,
-                    Exception("Cannot open output file")))
-                return@launch
-            }
-            val outputFd = outputFdResult.getOrThrow()
+            val outputFd = getRawFileDescriptor(outputFile)
+                .onFailure {
+                    viewModel.outputState.tryEmit(Pair(
+                        ImagesViewModel.OutputState.Failed,
+                        Exception("Cannot open output file")))
+                    return@launch
+                }
+                .getOrThrow()
+
+            val config = OptionsRepository.getOptions(this@MainActivity)
+                ?: Options.default()
+            val inputOptionsJson = config.toJson()
+                .onFailure {
+                    viewModel.outputState.tryEmit(Pair(
+                        ImagesViewModel.OutputState.Failed,
+                        Exception("Cannot convert options to JSON")))
+                    return@launch
+                }
+                .getOrThrow()
 
             // Run Stitchy
-            val inputFds = inputFilesResult.getOrThrow()
             val errorMessage = runStitchy(
+                inputOptionsJson,
                 inputFds.fileFds,
                 inputFds.mimeTypes,
                 outputFd,
