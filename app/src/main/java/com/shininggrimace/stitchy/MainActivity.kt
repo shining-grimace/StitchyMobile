@@ -8,8 +8,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -42,7 +40,7 @@ class MainActivity : AppCompatActivity(), ImageFiles {
             outputMimeType: String
         ): String?
 
-        fun logException(e: Exception) {
+        fun logException(e: Throwable) {
             Log.e("StitchyMobile", e.message ?: "(Unknown exception)")
         }
     }

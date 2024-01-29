@@ -14,15 +14,19 @@ object OptionsRepository {
 
     private var prefs: SharedPreferences? = null
 
-    fun getOptions(context: Context): Options? {
-
+    private fun getPrefsInstance(context: Context): SharedPreferences {
         val prefs = prefs ?: run {
             val newInstance = context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE)
             prefs = newInstance
             newInstance
         }
+        return prefs
+    }
 
-        val json = prefs.getString(PREFS_OPTIONS_KEY, null) ?: return null
+    fun getOptions(context: Context): Options? {
+
+        val json = getPrefsInstance(context).getString(PREFS_OPTIONS_KEY, null)
+            ?: return null
 
         return try {
             Moshi.Builder()
@@ -34,5 +38,23 @@ object OptionsRepository {
             Log.d("StitchyMobile", "Error decoding options: $e")
             null
         }
+    }
+
+    fun saveOptions(context: Context, options: Options): Result<Unit> {
+
+        val json = try {
+            Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+                .adapter(Options::class.java)
+                .toJson(options)
+        } catch (e: Exception) {
+            Log.d("StitchyMobile", "Error decoding options: $e")
+            null
+        }
+
+        getPrefsInstance(context).edit().putString(PREFS_OPTIONS_KEY, json).commit()
+
+        return Result.success(Unit)
     }
 }

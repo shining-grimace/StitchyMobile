@@ -10,7 +10,11 @@ data class Options(
     val quality: Int,
     val maxd: Int,
     val maxw: Int,
-    val maxh: Int
+    val maxh: Int,
+    val jpeg: Boolean,
+    val png: Boolean,
+    val gif: Boolean,
+    val bmp: Boolean
 ) {
     companion object {
         fun default(): Options =
@@ -20,7 +24,11 @@ data class Options(
                 quality = 0,
                 maxd = 0,
                 maxw = 0,
-                maxh = 0
+                maxh = 0,
+                jpeg = false,
+                png = true,
+                gif = false,
+                bmp = false
             )
     }
 
