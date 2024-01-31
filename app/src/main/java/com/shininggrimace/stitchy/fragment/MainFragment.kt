@@ -60,6 +60,7 @@ class MainFragment : Fragment(), MenuProvider {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (activity as? MenuHost)?.removeMenuProvider(this)
         _binding = null
     }
 

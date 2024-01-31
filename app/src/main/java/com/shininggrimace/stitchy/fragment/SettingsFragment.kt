@@ -8,8 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.view.MenuHost
@@ -51,6 +49,7 @@ class SettingsFragment : Fragment(), MenuProvider {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (activity as? MenuHost)?.removeMenuProvider(this)
         _binding = null
     }
 
