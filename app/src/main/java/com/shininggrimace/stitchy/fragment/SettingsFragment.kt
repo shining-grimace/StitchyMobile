@@ -63,7 +63,7 @@ class SettingsFragment : Fragment(), MenuProvider {
             R.id.action_save -> {
                 val saved = saveOptions()
                 if (saved) {
-                    findNavController().navigate(R.id.action_SettingsFragment_to_MainFragment)
+                    findNavController().navigateUp()
                 }
                 return saved
             }
