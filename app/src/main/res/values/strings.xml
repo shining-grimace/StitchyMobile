@@ -24,8 +24,10 @@
     <string name="no_message_generated">Internal error - nothing to display</string>
 
     <!-- Accessibility -->
+    <string name="acc_select_images">Select images from your gallery</string>
     <string name="acc_stitch_preview">Preview of stitch result</string>
     <string name="acc_selected_image">Selected image</string>
+    <string name="acc_export_generated">Export the generated image</string>
 
     <!-- Errors -->
     <string name="error_saving_settings">An error occurred while saving settings</string>

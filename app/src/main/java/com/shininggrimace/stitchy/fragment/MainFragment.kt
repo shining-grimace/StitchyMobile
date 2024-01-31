@@ -50,6 +50,9 @@ class MainFragment : Fragment(), MenuProvider {
                 updateOutputState(state, payload)
             }
         }
+        binding.exportOutputFab.setOnClickListener {
+            saveStitchOutput()
+        }
         return binding.root
     }
 
@@ -94,18 +97,21 @@ class MainFragment : Fragment(), MenuProvider {
     private fun updateOutputState(state: ImagesViewModel.OutputState, payload: Any) {
         when (state) {
             ImagesViewModel.OutputState.Empty -> {
+                binding.exportOutputFab.visibility = View.GONE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
                 binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.setText(R.string.no_images_selected)
             }
             ImagesViewModel.OutputState.Loading -> {
+                binding.exportOutputFab.visibility = View.GONE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
                 binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.setText(R.string.no_images_selected)
             }
             ImagesViewModel.OutputState.Completed -> {
+                binding.exportOutputFab.visibility = View.VISIBLE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.GONE
                 binding.stitchPreview.visibility = View.VISIBLE
@@ -116,6 +122,7 @@ class MainFragment : Fragment(), MenuProvider {
                 }
             }
             ImagesViewModel.OutputState.Failed -> {
+                binding.exportOutputFab.visibility = View.GONE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
                 binding.stitchPreview.visibility = View.INVISIBLE
@@ -123,5 +130,9 @@ class MainFragment : Fragment(), MenuProvider {
                     ?: getString(R.string.no_message_generated)
             }
         }
+    }
+
+    private fun saveStitchOutput() {
+        TODO("Save Stitch output")
     }
 }

@@ -16,6 +16,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintDimensionRatio="1.7777777777" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/export_output_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/acc_export_generated"
+        app:srcCompat="@android:drawable/ic_menu_save"
+        app:layout_constraintBottom_toBottomOf="@id/stitch_preview"
+        app:layout_constraintEnd_toEndOf="@id/stitch_preview" />
+
     <ProgressBar
         android:id="@+id/output_loading"
         android:layout_width="wrap_content"

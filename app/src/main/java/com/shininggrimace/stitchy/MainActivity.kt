@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), ImageFiles {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        binding.fab.setOnClickListener {
+        binding.selectImagesFab.setOnClickListener {
             pickImages.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
