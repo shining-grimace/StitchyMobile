@@ -15,11 +15,12 @@ import java.io.File
 
 interface ImageFiles {
 
+    private fun activity(): FragmentActivity = this as FragmentActivity
+
     fun processImageFiles(
-        from: FragmentActivity,
         viewModel: ImagesViewModel,
         uris: List<Uri>
-    ) = from.lifecycleScope.launch(Dispatchers.IO) {
+    ) = activity().lifecycleScope.launch(Dispatchers.IO) {
 
         // Mark loading
         viewModel.outputState.tryEmit(Pair(
@@ -27,7 +28,7 @@ interface ImageFiles {
             Unit))
 
         // Open input files
-        val inputFds = TypedFileDescriptors.fromPaths(from, uris)
+        val inputFds = TypedFileDescriptors.fromPaths(activity(), uris)
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
@@ -37,7 +38,7 @@ interface ImageFiles {
             .getOrThrow()
 
         // Get output file including MIME type
-        val outputFile = File.createTempFile("stitch_preview", ".png", from.cacheDir)
+        val outputFile = getTempOutputFile()
         val outputFd = getRawFileDescriptor(outputFile)
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
@@ -47,7 +48,7 @@ interface ImageFiles {
             }
             .getOrThrow()
 
-        val config = OptionsRepository.getOptions(from)
+        val config = OptionsRepository.getOptions(activity())
             ?: Options.default()
         val inputOptionsJson = config.toJson()
             .onFailure {
@@ -77,6 +78,14 @@ interface ImageFiles {
             ImagesViewModel.OutputState.Failed,
             Exception(errorMessage)))
     }
+
+    fun saveStitchOutput(): Result<Unit> {
+        val file = getTempOutputFile()
+        TODO()
+    }
+
+    private fun getTempOutputFile(): File =
+        File.createTempFile("stitch_preview", ".png", activity().cacheDir)
 
     private fun getRawFileDescriptor(file: File): Result<Int> {
         return try {

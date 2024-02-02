@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity(), ImageFiles {
     private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->
         val viewModel: ImagesViewModel by viewModels()
         viewModel.imageSelections.tryEmit(uris)
-        processImageFiles(this, viewModel, uris)
+        processImageFiles(viewModel, uris)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

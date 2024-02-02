@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.adapters.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
+import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -51,7 +52,7 @@ class MainFragment : Fragment(), MenuProvider {
             }
         }
         binding.exportOutputFab.setOnClickListener {
-            saveStitchOutput()
+            (activity as? ImageFiles)?.saveStitchOutput()
         }
         return binding.root
     }
@@ -130,9 +131,5 @@ class MainFragment : Fragment(), MenuProvider {
                     ?: getString(R.string.no_message_generated)
             }
         }
-    }
-
-    private fun saveStitchOutput() {
-        TODO("Save Stitch output")
     }
 }
