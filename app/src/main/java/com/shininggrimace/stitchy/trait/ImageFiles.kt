@@ -1,7 +1,10 @@
 package com.shininggrimace.stitchy.trait
 
+import android.content.ContentValues
 import android.net.Uri
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.provider.MediaStore
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.MainActivity
@@ -12,6 +15,10 @@ import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.OutputStream
 
 interface ImageFiles {
 
@@ -79,9 +86,43 @@ interface ImageFiles {
             Exception(errorMessage)))
     }
 
-    fun saveStitchOutput(): Result<Unit> {
-        val file = getTempOutputFile()
-        TODO()
+    fun saveStitchOutput(outputFileAbsolutePath: String): Result<String> {
+
+        val inputFile = File(outputFileAbsolutePath)
+        if (!inputFile.isFile) {
+            return Result.failure(Exception("Cannot save output - file does not exist"))
+        }
+
+        val outputFileName = scanNextOutputFileName()
+            .onFailure {
+                return Result.failure(it)
+            }
+            .getOrThrow()
+
+        val resolver = activity().contentResolver
+        val uri = resolver
+            .insert(
+                getImageCollection(),
+                ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, outputFileName)
+                }
+            )
+            ?: return Result.failure(Exception("A problem occurred writing the gallery"))
+
+        try {
+            val inputStream = inputFile.inputStream()
+            val outputStream = resolver.openOutputStream(uri, "w") ?: run {
+                return Result.failure(Exception("A problem occurred opening the file"))
+            }
+            sinkStream(inputStream, outputStream)
+            inputStream.close()
+            outputStream.close()
+        } catch (e: FileNotFoundException) {
+            return Result.failure(Exception("A problem occurred accessing the file"))
+        } catch (e: IOException) {
+            return Result.failure(Exception("A problem occurred writing the file"))
+        }
+        return Result.success(outputFileName)
     }
 
     private fun getTempOutputFile(): File =
@@ -95,6 +136,32 @@ interface ImageFiles {
         } catch (e: Exception) {
             MainActivity.logException(e)
             Result.failure(Exception("Cannot open output file"))
+        }
+    }
+
+    private fun getImageCollection(): Uri {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.getContentUri(
+                MediaStore.VOLUME_EXTERNAL_PRIMARY
+            )
+        } else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+    }
+
+    private fun scanNextOutputFileName(): Result<String> {
+        return Result.success("stitch.png")
+    }
+
+    @Throws(IOException::class)
+    private fun sinkStream(input: FileInputStream, output: OutputStream) {
+        val buffer = ByteArray(4096)
+        while (true) {
+            val bytesRead = input.read(buffer)
+            if (bytesRead == -1) {
+                return
+            }
+            output.write(buffer, 0, bytesRead)
         }
     }
 }

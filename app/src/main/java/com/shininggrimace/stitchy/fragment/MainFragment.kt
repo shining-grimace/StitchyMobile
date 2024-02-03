@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -21,8 +22,9 @@ import com.shininggrimace.stitchy.adapters.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
 import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -52,7 +54,14 @@ class MainFragment : Fragment(), MenuProvider {
             }
         }
         binding.exportOutputFab.setOnClickListener {
-            (activity as? ImageFiles)?.saveStitchOutput()
+            val message = exportOutputFile()
+                .run {
+                    when (isSuccess) {
+                        true -> getOrThrow()
+                        false -> exceptionOrNull()?.message ?: "(No message)"
+                    }
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
         return binding.root
     }
@@ -93,6 +102,16 @@ class MainFragment : Fragment(), MenuProvider {
         } else {
             binding.selectedFiles.visibility = View.INVISIBLE
         }
+    }
+
+    private fun exportOutputFile(): Result<String> {
+        val imageFiles = activity as ImageFiles
+        val viewModel: ImagesViewModel by activityViewModels()
+        val outputState = viewModel.outputState.value
+        if (outputState.first != ImagesViewModel.OutputState.Completed) {
+            return Result.failure(Exception("The stitch output doesn't appear to be ready"))
+        }
+        return imageFiles.saveStitchOutput(outputState.second as String)
     }
 
     private fun updateOutputState(state: ImagesViewModel.OutputState, payload: Any) {
