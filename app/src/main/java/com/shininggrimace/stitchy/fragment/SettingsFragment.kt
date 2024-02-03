@@ -23,7 +23,6 @@ import java.lang.NumberFormatException
 class SettingsFragment : Fragment(), MenuProvider {
 
     private var _binding: FragmentSettingsBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreateView(

@@ -11,6 +11,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -22,18 +26,17 @@ import com.shininggrimace.stitchy.adapters.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
 import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class MainFragment : Fragment(), MenuProvider {
+class MainFragment : Fragment(), MenuProvider, ImageFiles {
 
     private var _binding: FragmentMainBinding? = null
-
     private val binding get() = _binding!!
+
+    private lateinit var pickImages: ActivityResultLauncher<PickVisualMediaRequest>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +56,14 @@ class MainFragment : Fragment(), MenuProvider {
                 updateOutputState(state, payload)
             }
         }
+        binding.selectImagesFab.setOnClickListener {
+            pickImages.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        }
+        pickImages = registerForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia(),
+            onInputsSelected)
         binding.exportOutputFab.setOnClickListener {
             val message = exportOutputFile()
                 .run {
@@ -93,6 +104,12 @@ class MainFragment : Fragment(), MenuProvider {
         }
     }
 
+    private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->
+        val viewModel: ImagesViewModel by activityViewModels()
+        viewModel.imageSelections.tryEmit(uris)
+        processImageFiles(viewModel, uris)
+    }
+
     private fun showImageSelections(images: List<Uri>) {
         val context = context ?: return
         if (images.isNotEmpty()) {
@@ -105,13 +122,12 @@ class MainFragment : Fragment(), MenuProvider {
     }
 
     private fun exportOutputFile(): Result<String> {
-        val imageFiles = activity as ImageFiles
         val viewModel: ImagesViewModel by activityViewModels()
         val outputState = viewModel.outputState.value
         if (outputState.first != ImagesViewModel.OutputState.Completed) {
             return Result.failure(Exception("The stitch output doesn't appear to be ready"))
         }
-        return imageFiles.saveStitchOutput(outputState.second as String)
+        return saveStitchOutput(outputState.second as String)
     }
 
     private fun updateOutputState(state: ImagesViewModel.OutputState, payload: Any) {

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.MainActivity
@@ -22,7 +23,7 @@ import java.io.OutputStream
 
 interface ImageFiles {
 
-    private fun activity(): FragmentActivity = this as FragmentActivity
+    private fun activity(): FragmentActivity = (this as Fragment).requireActivity()
 
     fun processImageFiles(
         viewModel: ImagesViewModel,
