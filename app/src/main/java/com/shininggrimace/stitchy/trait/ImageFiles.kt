@@ -44,9 +44,10 @@ interface ImageFiles {
             }
             .getOrThrow()
 
-        // Get output file including MIME type
-        val outputFile = getTempOutputFile()
-        val outputFd = getRawFileDescriptor(outputFile)
+        // Get configuration, or use defaults if there were none
+        val config = OptionsRepository.getOptions(activity())
+            ?: Options.default()
+        val inputOptionsJson = config.toJson()
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
@@ -55,9 +56,9 @@ interface ImageFiles {
             }
             .getOrThrow()
 
-        val config = OptionsRepository.getOptions(activity())
-            ?: Options.default()
-        val inputOptionsJson = config.toJson()
+        // Get output file including MIME type
+        val outputFile = getTempOutputFile(config.getFileExtension())
+        val outputFd = getRawFileDescriptor(outputFile)
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
@@ -72,7 +73,7 @@ interface ImageFiles {
             inputFds.fileFds,
             inputFds.mimeTypes,
             outputFd,
-            "image/png"
+            config.getMimeType()
         ) ?: run {
             viewModel.outputState.tryEmit(Pair(
                 ImagesViewModel.OutputState.Completed,
@@ -88,12 +89,17 @@ interface ImageFiles {
 
     fun saveStitchOutput(outputFileAbsolutePath: String): Result<String> {
 
+        val fileExtension: String = outputFileAbsolutePath.lastIndexOf('.')
+            .takeIf { it > 0 && it < outputFileAbsolutePath.length - 1 }
+            ?.let { outputFileAbsolutePath.substring(it + 1) }
+            ?: return Result.failure(Exception("Cannot save output - failed reading extension"))
+
         val inputFile = File(outputFileAbsolutePath)
         if (!inputFile.isFile) {
             return Result.failure(Exception("Cannot save output - file does not exist"))
         }
 
-        val outputFileName = scanNextOutputFileName()
+        val outputFileName = scanNextOutputFileName(fileExtension)
             .onFailure {
                 return Result.failure(it)
             }
@@ -125,8 +131,8 @@ interface ImageFiles {
         return Result.success(outputFileName)
     }
 
-    private fun getTempOutputFile(): File =
-        File.createTempFile("stitch_preview", ".png", activity().cacheDir)
+    private fun getTempOutputFile(fileExtension: String): File =
+        File.createTempFile("stitch_preview", ".$fileExtension", activity().cacheDir)
 
     private fun getRawFileDescriptor(file: File): Result<Int> {
         return try {
@@ -149,8 +155,8 @@ interface ImageFiles {
         }
     }
 
-    private fun scanNextOutputFileName(): Result<String> {
-        return Result.success("stitch.png")
+    private fun scanNextOutputFileName(fileExtension: String): Result<String> {
+        return Result.success("stitch.$fileExtension")
     }
 
     @Throws(IOException::class)

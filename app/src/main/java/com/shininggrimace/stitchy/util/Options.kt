@@ -45,4 +45,20 @@ data class Options(
             Result.failure(Exception("Error converting options to JSON"))
         }
     }
+
+    fun getFileExtension(): String = when {
+        jpeg -> "jpg"
+        png -> "png"
+        gif -> "gif"
+        bmp -> "bmp"
+        else -> "png"
+    }
+
+    fun getMimeType(): String = when {
+        jpeg -> "image/jpeg"
+        png -> "image/png"
+        gif -> "image/gif"
+        bmp -> "image/bmp"
+        else -> "image/png"
+    }
 }
