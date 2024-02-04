@@ -57,6 +57,9 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
                 updateOutputState(state, payload)
             }
         }
+        binding.clearImagesFab.setOnClickListener {
+            clearInputs()
+        }
         binding.selectImagesFab.setOnClickListener {
             pickImages.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -104,8 +107,14 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
             return@ActivityResultCallback
         }
         val viewModel: ImagesViewModel by activityViewModels()
-        viewModel.imageSelections.tryEmit(uris)
-        processImageFiles(viewModel, uris)
+        val totalList = viewModel.imageSelections.value + uris
+        viewModel.imageSelections.tryEmit(totalList)
+        processImageFiles(viewModel, totalList)
+    }
+
+    private fun clearInputs() {
+        val viewModel: ImagesViewModel by activityViewModels()
+        viewModel.imageSelections.tryEmit(listOf())
     }
 
     private fun showImageSelections(images: List<Uri>) {
