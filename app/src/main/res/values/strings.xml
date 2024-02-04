@@ -6,11 +6,11 @@
 
     <!-- Labels -->
     <string name="main_fragment_label">Stitchy</string>
-    <string name="settings_fragment_label">Settings</string>
-    <string name="input_format">Format</string>
+    <string name="settings_fragment_label">Export Settings</string>
+    <string name="input_format">Export Format</string>
     <string name="input_quality">Quality</string>
     <string name="input_arrangement">Arrangement</string>
-    <string name="input_size_limit">Size Limit</string>
+    <string name="input_size_limit">Limit Dimensions</string>
     <string name="input_pixels">Pixels</string>
 
     <!-- Actions -->

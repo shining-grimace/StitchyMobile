@@ -50,6 +50,7 @@
             android:id="@+id/setting_arrangement_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/settings_menu_spacing"
             android:labelFor="@id/setting_arrangement_input"
             style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:hint="@string/input_arrangement">
@@ -67,6 +68,7 @@
             android:id="@+id/setting_size_limit_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/settings_menu_spacing"
             android:labelFor="@id/setting_size_limit_input"
             style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:hint="@string/input_size_limit">
