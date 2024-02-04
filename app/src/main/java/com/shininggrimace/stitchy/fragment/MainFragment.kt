@@ -100,6 +100,9 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
     }
 
     private val onInputsSelected = ActivityResultCallback<List<Uri>> { uris ->
+        if (uris.isEmpty()) {
+            return@ActivityResultCallback
+        }
         val viewModel: ImagesViewModel by activityViewModels()
         viewModel.imageSelections.tryEmit(uris)
         processImageFiles(viewModel, uris)
