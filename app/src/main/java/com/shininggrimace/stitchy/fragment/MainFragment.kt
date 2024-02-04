@@ -135,7 +135,7 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         }
 
         val (fileName, contentUri) = result.getOrThrow()
-        Snackbar.make(binding.root, fileName, Snackbar.LENGTH_SHORT)
+        Snackbar.make(binding.root, fileName, Snackbar.LENGTH_LONG)
             .setAction("Open") {
                 openImageInGallery(contentUri)
             }

@@ -20,6 +20,9 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 interface ImageFiles {
 
@@ -100,11 +103,7 @@ interface ImageFiles {
             return Result.failure(Exception("Cannot save output - file does not exist"))
         }
 
-        val outputFileName = scanNextOutputFileName(fileExtension)
-            .onFailure {
-                return Result.failure(it)
-            }
-            .getOrThrow()
+        val outputFileName = getOutputFileName(fileExtension)
 
         val resolver = activity().contentResolver
         val contentUri = resolver
@@ -157,8 +156,10 @@ interface ImageFiles {
         }
     }
 
-    private fun scanNextOutputFileName(fileExtension: String): Result<String> {
-        return Result.success("stitch.$fileExtension")
+    private fun getOutputFileName(fileExtension: String): String {
+        val formatter = SimpleDateFormat("yyyyMMdd_hhmmss", Locale.getDefault())
+        val timestamp = formatter.format(Date())
+        return "stitch_$timestamp.$fileExtension"
     }
 
     @Throws(IOException::class)
