@@ -12,17 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StitchyMobile"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.StitchyMobile">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
 
 </manifest>

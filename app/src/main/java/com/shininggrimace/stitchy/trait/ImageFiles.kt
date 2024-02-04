@@ -88,7 +88,7 @@ interface ImageFiles {
             Exception(errorMessage)))
     }
 
-    fun saveStitchOutput(outputFileAbsolutePath: String): Result<String> {
+    fun saveStitchOutput(outputFileAbsolutePath: String): Result<Pair<String, Uri>> {
 
         val fileExtension: String = outputFileAbsolutePath.lastIndexOf('.')
             .takeIf { it > 0 && it < outputFileAbsolutePath.length - 1 }
@@ -107,7 +107,7 @@ interface ImageFiles {
             .getOrThrow()
 
         val resolver = activity().contentResolver
-        val uri = resolver
+        val contentUri = resolver
             .insert(
                 getImageCollection(),
                 ContentValues().apply {
@@ -118,7 +118,7 @@ interface ImageFiles {
 
         try {
             val inputStream = inputFile.inputStream()
-            val outputStream = resolver.openOutputStream(uri, "w") ?: run {
+            val outputStream = resolver.openOutputStream(contentUri, "w") ?: run {
                 return Result.failure(Exception("A problem occurred opening the file"))
             }
             sinkStream(inputStream, outputStream)
@@ -129,7 +129,8 @@ interface ImageFiles {
         } catch (e: IOException) {
             return Result.failure(Exception("A problem occurred writing the file"))
         }
-        return Result.success(outputFileName)
+        return Result.success(
+            Pair(outputFileName, contentUri))
     }
 
     private fun getTempOutputFile(fileExtension: String): File =

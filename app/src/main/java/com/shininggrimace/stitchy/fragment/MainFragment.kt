@@ -1,5 +1,6 @@
 package com.shininggrimace.stitchy.fragment
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -10,7 +11,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -21,6 +21,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.adapters.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
@@ -65,14 +66,8 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
             ActivityResultContracts.PickMultipleVisualMedia(),
             onInputsSelected)
         binding.exportOutputFab.setOnClickListener {
-            val message = exportOutputFile()
-                .run {
-                    when (isSuccess) {
-                        true -> getOrThrow()
-                        false -> exceptionOrNull()?.message ?: "(No message)"
-                    }
-                }
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            processExportResult(
+                exportOutputFile())
         }
         return binding.root
     }
@@ -121,13 +116,39 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         }
     }
 
-    private fun exportOutputFile(): Result<String> {
+    private fun exportOutputFile(): Result<Pair<String, Uri>> {
         val viewModel: ImagesViewModel by activityViewModels()
         val outputState = viewModel.outputState.value
         if (outputState.first != ImagesViewModel.OutputState.Completed) {
             return Result.failure(Exception("The stitch output doesn't appear to be ready"))
         }
         return saveStitchOutput(outputState.second as String)
+    }
+
+    private fun processExportResult(result: Result<Pair<String, Uri>>) {
+
+        if (result.isFailure) {
+            val message = result.exceptionOrNull()?.message ?: "(No message)"
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+                .show()
+            return
+        }
+
+        val (fileName, contentUri) = result.getOrThrow()
+        Snackbar.make(binding.root, fileName, Snackbar.LENGTH_SHORT)
+            .setAction("Open") {
+                openImageInGallery(contentUri)
+            }
+            .show()
+    }
+
+    private fun openImageInGallery(contentUri: Uri) {
+        val activity = activity ?: return
+        val intent = Intent(Intent.ACTION_VIEW)
+            .setDataAndType(contentUri, "image/*")
+        if (intent.resolveActivity(activity.packageManager) != null) {
+            activity.startActivity(intent)
+        }
     }
 
     private fun updateOutputState(state: ImagesViewModel.OutputState, payload: Any) {
