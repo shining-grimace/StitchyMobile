@@ -42,6 +42,7 @@
                 android:id="@+id/setting_quality_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
                 android:inputType="number" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -94,6 +95,7 @@
                 android:id="@+id/setting_pixels_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
                 android:inputType="number" />
 
         </com.google.android.material.textfield.TextInputLayout>
