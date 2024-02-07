@@ -1,6 +1,7 @@
 package com.shininggrimace.stitchy.trait
 
 import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
@@ -9,12 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.MainActivity
+import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.util.Options
 import com.shininggrimace.stitchy.util.OptionsRepository
 import com.shininggrimace.stitchy.util.TypedFileDescriptors
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -29,6 +32,7 @@ interface ImageFiles {
     private fun activity(): FragmentActivity = (this as Fragment).requireActivity()
 
     fun processImageFiles(
+        context: Context,
         viewModel: ImagesViewModel,
         uris: List<Uri>
     ) = activity().lifecycleScope.launch(Dispatchers.IO) {
@@ -51,7 +55,7 @@ interface ImageFiles {
         // Get configuration, or use defaults if there were none
         val config = OptionsRepository.getOptions(activity())
             ?: Options.default()
-        val inputOptionsJson = config.toJson()
+        val inputOptionsJson = config.toJson(context)
             .onFailure {
                 viewModel.outputState.tryEmit(Pair(
                     ImagesViewModel.OutputState.Failed,
@@ -96,11 +100,17 @@ interface ImageFiles {
         val fileExtension: String = outputFileAbsolutePath.lastIndexOf('.')
             .takeIf { it > 0 && it < outputFileAbsolutePath.length - 1 }
             ?.let { outputFileAbsolutePath.substring(it + 1) }
-            ?: return Result.failure(Exception("Cannot save output - failed reading extension"))
+            ?: run {
+                val userMessage = activity().getString(R.string.error_cannot_read_output_file)
+                Timber.e("Failed reading file extension")
+                return Result.failure(Exception(userMessage))
+            }
 
         val inputFile = File(outputFileAbsolutePath)
         if (!inputFile.isFile) {
-            return Result.failure(Exception("Cannot save output - file does not exist"))
+            val userMessage = activity().getString(R.string.error_cannot_read_output_file)
+            Timber.e("Output file does not exist")
+            return Result.failure(Exception(userMessage))
         }
 
         val outputFileName = getOutputFileName(fileExtension)
@@ -113,20 +123,30 @@ interface ImageFiles {
                     put(MediaStore.Images.Media.DISPLAY_NAME, outputFileName)
                 }
             )
-            ?: return Result.failure(Exception("A problem occurred writing the gallery"))
+            ?: run {
+                Timber.e("A problem occurred writing the gallery")
+                return Result.failure(Exception(
+                    activity().getString(R.string.error_cannot_write_media)))
+            }
 
         try {
             val inputStream = inputFile.inputStream()
             val outputStream = resolver.openOutputStream(contentUri, "w") ?: run {
-                return Result.failure(Exception("A problem occurred opening the file"))
+                Timber.e("A problem occurred opening the file")
+                return Result.failure(Exception(
+                    activity().getString(R.string.error_cannot_write_media)))
             }
             sinkStream(inputStream, outputStream)
             inputStream.close()
             outputStream.close()
         } catch (e: FileNotFoundException) {
-            return Result.failure(Exception("A problem occurred accessing the file"))
+            Timber.e("A problem occurred accessing the file")
+            return Result.failure(Exception(
+                activity().getString(R.string.error_cannot_write_media)))
         } catch (e: IOException) {
-            return Result.failure(Exception("A problem occurred writing the file"))
+            Timber.e("A problem occurred writing the file")
+            return Result.failure(Exception(
+                activity().getString(R.string.error_cannot_write_media)))
         }
         return Result.success(
             Pair(outputFileName, contentUri))
@@ -141,7 +161,7 @@ interface ImageFiles {
             val pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE)
             Result.success(pfd.detachFd())
         } catch (e: Exception) {
-            MainActivity.logException(e)
+            Timber.e(e)
             Result.failure(Exception("Cannot open output file"))
         }
     }

@@ -31,6 +31,10 @@
 
     <!-- Errors -->
     <string name="error_saving_settings">An error occurred while saving settings</string>
+    <string name="error_cannot_read_output_file">An error occurred while saving settings</string>
+    <string name="error_cannot_write_media">An error occurred while writing to the image collection</string>
+    <string name="error_parsing_setting">An error occurred while parsing settings</string>
+    <string name="error_accessing_files">Cannot open selected files</string>
 
     <!-- Items Menus -->
     <string-array name="setting_format_items">

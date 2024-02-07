@@ -1,4 +1,4 @@
-package com.shininggrimace.stitchy.adapters
+package com.shininggrimace.stitchy.adapter
 
 import android.net.Uri
 import android.view.LayoutInflater

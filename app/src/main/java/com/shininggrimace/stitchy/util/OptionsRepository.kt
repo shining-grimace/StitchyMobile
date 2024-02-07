@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import timber.log.Timber
 import java.lang.Exception
 
 private const val PREFS_FILE_NAME = "prefs"
@@ -35,7 +36,7 @@ object OptionsRepository {
                 .adapter(Options::class.java)
                 .fromJson(json)
         } catch (e: Exception) {
-            Log.d("StitchyMobile", "Error decoding options: $e")
+            Timber.e(e)
             null
         }
     }
@@ -49,7 +50,7 @@ object OptionsRepository {
                 .adapter(Options::class.java)
                 .toJson(options)
         } catch (e: Exception) {
-            Log.d("StitchyMobile", "Error decoding options: $e")
+            Timber.e(e)
             null
         }
 

@@ -1,8 +1,10 @@
 package com.shininggrimace.stitchy.util
 
-import com.shininggrimace.stitchy.MainActivity
+import android.content.Context
+import com.shininggrimace.stitchy.R
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import timber.log.Timber
 
 data class Options(
     val horizontal: Boolean,
@@ -32,7 +34,7 @@ data class Options(
             )
     }
 
-    fun toJson(): Result<String> {
+    fun toJson(context: Context): Result<String> {
         return try {
             val json = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
@@ -41,8 +43,9 @@ data class Options(
                 .toJson(this)
             Result.success(json)
         } catch (e: Exception) {
-            MainActivity.logException(e)
-            Result.failure(Exception("Error converting options to JSON"))
+            Timber.e(e)
+            Result.failure(Exception(
+                context.getString(R.string.error_parsing_setting)))
         }
     }
 

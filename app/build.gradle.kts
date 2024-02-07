@@ -33,6 +33,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -44,6 +45,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
 
 tasks.register<Exec>("compileRust") {

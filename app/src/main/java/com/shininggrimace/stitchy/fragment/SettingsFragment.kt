@@ -13,11 +13,11 @@ import androidx.annotation.StringRes
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
-import com.shininggrimace.stitchy.MainActivity
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.databinding.FragmentSettingsBinding
 import com.shininggrimace.stitchy.util.Options
 import com.shininggrimace.stitchy.util.OptionsRepository
+import timber.log.Timber
 import java.lang.NumberFormatException
 
 class SettingsFragment : Fragment(), MenuProvider {
@@ -77,7 +77,7 @@ class SettingsFragment : Fragment(), MenuProvider {
     private fun saveOptions(): Boolean {
         val options = retrieveOptions()
             .onFailure {
-                MainActivity.logException(it)
+                Timber.e(it)
                 toast(R.string.error_saving_settings)
                 return false
             }
@@ -167,7 +167,9 @@ class SettingsFragment : Fragment(), MenuProvider {
         val formatStrings = resources.getStringArray(R.array.setting_format_items)
         val formatPosition = formatStrings.indexOf(formatText)
         if (formatPosition < 0) {
-            return Result.failure(Exception("Cannot find selected format"))
+            Timber.e("Cannot find selected format")
+            return Result.failure(Exception(
+                getString(R.string.error_parsing_setting)))
         }
 
         val qualityNumber = if (binding.settingQualityLayout.isEnabled) {
@@ -186,14 +188,18 @@ class SettingsFragment : Fragment(), MenuProvider {
         val arrangementStrings = resources.getStringArray(R.array.setting_arrangement_items)
         val arrangementPosition = arrangementStrings.indexOf(arrangementText)
         if (arrangementPosition < 0) {
-            return Result.failure(Exception("Cannot find selected arrangement"))
+            Timber.e("Cannot find selected arrangement")
+            return Result.failure(Exception(
+                getString(R.string.error_parsing_setting)))
         }
 
         val sizeLimitText = binding.settingSizeLimitInput.text.toString()
         val sizeLimitStrings = resources.getStringArray(R.array.setting_size_limit_items)
         val sizeLimitPosition = sizeLimitStrings.indexOf(sizeLimitText)
         if (sizeLimitPosition < 0) {
-            return Result.failure(Exception("Cannot find selected size limit"))
+            Timber.e("Cannot find selected size limit")
+            return Result.failure(Exception(
+                getString(R.string.error_parsing_setting)))
         }
 
         val pixelsNumber = if (binding.settingPixelsLayout.isEnabled) {

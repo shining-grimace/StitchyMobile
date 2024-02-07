@@ -8,6 +8,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,10 +30,6 @@ class MainActivity : AppCompatActivity() {
             outputFd: Int,
             outputMimeType: String
         ): String?
-
-        fun logException(e: Throwable) {
-            Log.e("StitchyMobile", e.message ?: "(Unknown exception)")
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

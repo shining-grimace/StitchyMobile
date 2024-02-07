@@ -23,11 +23,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.shininggrimace.stitchy.R
-import com.shininggrimace.stitchy.adapters.ImageAdapter
+import com.shininggrimace.stitchy.adapter.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
 import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -109,7 +110,7 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         val viewModel: ImagesViewModel by activityViewModels()
         val totalList = viewModel.imageSelections.value + uris
         viewModel.imageSelections.tryEmit(totalList)
-        processImageFiles(viewModel, totalList)
+        processImageFiles(requireActivity(), viewModel, totalList)
     }
 
     private fun clearInputs() {
@@ -132,7 +133,9 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         val viewModel: ImagesViewModel by activityViewModels()
         val outputState = viewModel.outputState.value
         if (outputState.first != ImagesViewModel.OutputState.Completed) {
-            return Result.failure(Exception("The stitch output doesn't appear to be ready"))
+            Timber.e("The stitch output doesn't appear to be ready")
+            return Result.failure(Exception(
+                getString(R.string.error_cannot_write_media)))
         }
         return saveStitchOutput(outputState.second as String)
     }
