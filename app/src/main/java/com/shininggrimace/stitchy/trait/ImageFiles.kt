@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.shininggrimace.stitchy.MainActivity
 import com.shininggrimace.stitchy.R
+import com.shininggrimace.stitchy.util.ExportResult
 import com.shininggrimace.stitchy.util.Options
 import com.shininggrimace.stitchy.util.OptionsRepository
 import com.shininggrimace.stitchy.util.TypedFileDescriptors
@@ -38,16 +39,16 @@ interface ImageFiles {
     ) = activity().lifecycleScope.launch(Dispatchers.IO) {
 
         // Mark loading
-        viewModel.outputState.tryEmit(Pair(
-            ImagesViewModel.OutputState.Loading,
-            Unit))
+        viewModel.emitOutputState(
+            ImagesViewModel.ProcessingState.Loading)
 
         // Open input files
         val inputFds = TypedFileDescriptors.fromPaths(activity(), uris)
             .onFailure {
-                viewModel.outputState.tryEmit(Pair(
-                    ImagesViewModel.OutputState.Failed,
-                    it))
+                viewModel.emitOutputState(
+                    ImagesViewModel.ProcessingState.Failed,
+                    it
+                )
                 return@launch
             }
             .getOrThrow()
@@ -57,9 +58,9 @@ interface ImageFiles {
             ?: Options.default()
         val inputOptionsJson = config.toJson(context)
             .onFailure {
-                viewModel.outputState.tryEmit(Pair(
-                    ImagesViewModel.OutputState.Failed,
-                    it))
+                viewModel.emitOutputState(
+                    ImagesViewModel.ProcessingState.Failed,
+                    it)
                 return@launch
             }
             .getOrThrow()
@@ -68,9 +69,9 @@ interface ImageFiles {
         val outputFile = getTempOutputFile(config.getFileExtension())
         val outputFd = getRawFileDescriptor(outputFile)
             .onFailure {
-                viewModel.outputState.tryEmit(Pair(
-                    ImagesViewModel.OutputState.Failed,
-                    it))
+                viewModel.emitOutputState(
+                    ImagesViewModel.ProcessingState.Failed,
+                    it)
                 return@launch
             }
             .getOrThrow()
@@ -83,19 +84,19 @@ interface ImageFiles {
             outputFd,
             config.getMimeType()
         ) ?: run {
-            viewModel.outputState.tryEmit(Pair(
-                ImagesViewModel.OutputState.Completed,
-                outputFile.absolutePath))
+            viewModel.emitOutputState(
+                ImagesViewModel.ProcessingState.Completed,
+                outputFile.absolutePath)
             return@launch
         }
 
         // Update UI as completed
-        viewModel.outputState.tryEmit(Pair(
-            ImagesViewModel.OutputState.Failed,
-            Exception(errorMessage)))
+        viewModel.emitOutputState(
+            ImagesViewModel.ProcessingState.Failed,
+            Exception(errorMessage))
     }
 
-    fun saveStitchOutput(outputFileAbsolutePath: String): Result<Pair<String, Uri>> {
+    fun saveStitchOutput(outputFileAbsolutePath: String): Result<ExportResult> {
 
         val fileExtension: String = outputFileAbsolutePath.lastIndexOf('.')
             .takeIf { it > 0 && it < outputFileAbsolutePath.length - 1 }
@@ -149,7 +150,7 @@ interface ImageFiles {
                 activity().getString(R.string.error_cannot_write_media)))
         }
         return Result.success(
-            Pair(outputFileName, contentUri))
+            ExportResult(outputFileName, contentUri))
     }
 
     private fun getTempOutputFile(fileExtension: String): File =

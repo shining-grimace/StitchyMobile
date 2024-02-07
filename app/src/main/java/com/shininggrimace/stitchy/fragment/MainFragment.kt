@@ -26,6 +26,7 @@ import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.adapter.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
 import com.shininggrimace.stitchy.trait.ImageFiles
+import com.shininggrimace.stitchy.util.ExportResult
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -78,7 +79,7 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updateOutputState(ImagesViewModel.OutputState.Empty, Unit)
+        updateOutputState(ImagesViewModel.ProcessingState.Empty, Unit)
     }
 
     override fun onDestroyView() {
@@ -129,18 +130,18 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         }
     }
 
-    private fun exportOutputFile(): Result<Pair<String, Uri>> {
+    private fun exportOutputFile(): Result<ExportResult> {
         val viewModel: ImagesViewModel by activityViewModels()
         val outputState = viewModel.outputState.value
-        if (outputState.first != ImagesViewModel.OutputState.Completed) {
+        if (outputState.state != ImagesViewModel.ProcessingState.Completed) {
             Timber.e("The stitch output doesn't appear to be ready")
             return Result.failure(Exception(
                 getString(R.string.error_cannot_write_media)))
         }
-        return saveStitchOutput(outputState.second as String)
+        return saveStitchOutput(outputState.data as String)
     }
 
-    private fun processExportResult(result: Result<Pair<String, Uri>>) {
+    private fun processExportResult(result: Result<ExportResult>) {
 
         if (result.isFailure) {
             val message = result.exceptionOrNull()?.message ?: "(No message)"
@@ -149,10 +150,10 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
             return
         }
 
-        val (fileName, contentUri) = result.getOrThrow()
-        Snackbar.make(binding.root, fileName, Snackbar.LENGTH_LONG)
+        val exportResult = result.getOrThrow()
+        Snackbar.make(binding.root, exportResult.fileName, Snackbar.LENGTH_LONG)
             .setAction("Open") {
-                openImageInGallery(contentUri)
+                openImageInGallery(exportResult.uri)
             }
             .show()
     }
@@ -166,23 +167,23 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         }
     }
 
-    private fun updateOutputState(state: ImagesViewModel.OutputState, payload: Any) {
+    private fun updateOutputState(state: ImagesViewModel.ProcessingState, payload: Any) {
         when (state) {
-            ImagesViewModel.OutputState.Empty -> {
+            ImagesViewModel.ProcessingState.Empty -> {
                 binding.exportOutputFab.visibility = View.GONE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
                 binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.setText(R.string.no_images_selected)
             }
-            ImagesViewModel.OutputState.Loading -> {
+            ImagesViewModel.ProcessingState.Loading -> {
                 binding.exportOutputFab.visibility = View.GONE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
                 binding.stitchPreview.visibility = View.INVISIBLE
                 binding.outputLabel.setText(R.string.no_images_selected)
             }
-            ImagesViewModel.OutputState.Completed -> {
+            ImagesViewModel.ProcessingState.Completed -> {
                 binding.exportOutputFab.visibility = View.VISIBLE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.GONE
@@ -193,7 +194,7 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
                     )
                 }
             }
-            ImagesViewModel.OutputState.Failed -> {
+            ImagesViewModel.ProcessingState.Failed -> {
                 binding.exportOutputFab.visibility = View.GONE
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.VISIBLE
