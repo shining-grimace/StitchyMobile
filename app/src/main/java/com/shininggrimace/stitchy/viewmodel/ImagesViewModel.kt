@@ -22,14 +22,14 @@ class ImagesViewModel: ViewModel() {
     val outputState: MutableStateFlow<OutputUpdate> = MutableStateFlow(
         OutputUpdate(ProcessingState.Empty, Unit))
 
-    fun emitOutputState(state: ProcessingState, data: Any) {
-        outputState.tryEmit(
+    suspend fun emitOutputState(state: ProcessingState, data: Any) {
+        outputState.emit(
             OutputUpdate(state, data)
         )
     }
 
-    fun emitOutputState(state: ProcessingState) {
-        outputState.tryEmit(
+    suspend fun emitOutputState(state: ProcessingState) {
+        outputState.emit(
             OutputUpdate(state, Unit)
         )
     }

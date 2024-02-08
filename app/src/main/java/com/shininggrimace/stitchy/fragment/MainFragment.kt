@@ -178,10 +178,9 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
             }
             ImagesViewModel.ProcessingState.Loading -> {
                 binding.exportOutputFab.visibility = View.GONE
-                binding.outputLoading.visibility = View.GONE
-                binding.outputLabel.visibility = View.VISIBLE
+                binding.outputLoading.visibility = View.VISIBLE
+                binding.outputLabel.visibility = View.GONE
                 binding.stitchPreview.visibility = View.INVISIBLE
-                binding.outputLabel.setText(R.string.no_images_selected)
             }
             ImagesViewModel.ProcessingState.Completed -> {
                 binding.exportOutputFab.visibility = View.VISIBLE
