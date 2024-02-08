@@ -46,6 +46,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation("io.coil-kt:coil:1.4.0")
 }
 
 tasks.register<Exec>("compileRust") {
