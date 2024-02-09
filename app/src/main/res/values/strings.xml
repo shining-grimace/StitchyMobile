@@ -29,12 +29,19 @@
     <string name="acc_selected_image">Selected image</string>
     <string name="acc_export_generated">Export the generated image</string>
 
+    <!-- Validation -->
+    <string name="validation_dimension_not_sensible">This dimension limit is invalid and will be reverted to None</string>
+    <string name="validation_quality_not_sensible">This quality is not valid and will be reverted to the default of 90</string>
+
     <!-- Errors -->
     <string name="error_saving_settings">An error occurred while saving settings</string>
     <string name="error_cannot_read_output_file">An error occurred while saving settings</string>
     <string name="error_cannot_write_media">An error occurred while writing to the image collection</string>
     <string name="error_parsing_setting">An error occurred while parsing settings</string>
     <string name="error_accessing_files">Cannot open selected files</string>
+
+    <!-- Utility -->
+    <string name="text_concat_newline">%s\n%s</string>
 
     <!-- Items Menus -->
     <string-array name="setting_format_items">

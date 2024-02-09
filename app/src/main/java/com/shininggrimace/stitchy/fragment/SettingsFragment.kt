@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.databinding.FragmentSettingsBinding
@@ -21,6 +22,11 @@ import timber.log.Timber
 import java.lang.NumberFormatException
 
 class SettingsFragment : Fragment(), MenuProvider {
+
+    private data class ValidatedNumber(
+        val matchesUserInput: Boolean,
+        val resultingNumber: Int
+    )
 
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
@@ -37,12 +43,7 @@ class SettingsFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.settingFormatInput.setOnItemClickListener { _, _, position, _ ->
-            binding.settingQualityLayout.isEnabled = position == 0
-        }
-        binding.settingSizeLimitInput.setOnItemClickListener { _, _, position, _ ->
-            binding.settingPixelsLayout.isEnabled = position != 0
-        }
+        applyListeners()
         prefillOptions()
     }
 
@@ -88,6 +89,23 @@ class SettingsFragment : Fragment(), MenuProvider {
                 return false
             }
         return true
+    }
+
+    private fun applyListeners() {
+        binding.settingFormatInput.setOnItemClickListener { _, _, position, _ ->
+            binding.settingQualityLayout.isEnabled = position == 0
+            updateValidationMessage()
+        }
+        binding.settingQualityInput.doOnTextChanged { _, _, _, _ ->
+            updateValidationMessage()
+        }
+        binding.settingSizeLimitInput.setOnItemClickListener { _, _, position, _ ->
+            binding.settingPixelsLayout.isEnabled = position != 0
+            updateValidationMessage()
+        }
+        binding.settingPixelsInput.doOnTextChanged { _, _, _, _ ->
+            updateValidationMessage()
+        }
     }
 
     private fun prefillOptions() {
@@ -172,17 +190,7 @@ class SettingsFragment : Fragment(), MenuProvider {
                 getString(R.string.error_parsing_setting)))
         }
 
-        val qualityNumber = if (binding.settingQualityLayout.isEnabled) {
-            try {
-                binding.settingQualityInput.text?.toString()
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.toInt() ?: 0
-            } catch (e: NumberFormatException) {
-                0
-            }
-        } else {
-            0
-        }
+        val qualityNumber = validateQuality().resultingNumber
 
         val arrangementText = binding.settingArrangementInput.text.toString()
         val arrangementStrings = resources.getStringArray(R.array.setting_arrangement_items)
@@ -202,17 +210,7 @@ class SettingsFragment : Fragment(), MenuProvider {
                 getString(R.string.error_parsing_setting)))
         }
 
-        val pixelsNumber = if (binding.settingPixelsLayout.isEnabled) {
-            try {
-                binding.settingPixelsInput.text?.toString()
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.toInt() ?: 0
-            } catch (e: NumberFormatException) {
-                0
-            }
-        } else {
-            0
-        }
+        val pixelsNumber = validateDimension().resultingNumber
 
         val options = Options(
             horizontal = arrangementPosition == 1,
@@ -227,5 +225,70 @@ class SettingsFragment : Fragment(), MenuProvider {
             bmp = formatPosition == 3
         )
         return Result.success(options)
+    }
+
+    private fun updateValidationMessage() {
+
+        val isQualitySensible = validateQuality().matchesUserInput
+        val isDimensionSensible = validateDimension().matchesUserInput
+
+        if (isQualitySensible && isDimensionSensible) {
+            binding.validationMessage.visibility = View.GONE
+            return
+        }
+
+        binding.validationMessage.visibility = View.VISIBLE
+        if (isQualitySensible) {
+            binding.validationMessage.setText(R.string.validation_dimension_not_sensible)
+        } else if (isDimensionSensible) {
+            binding.validationMessage.setText(R.string.validation_quality_not_sensible)
+        } else {
+            val qualityMessage = getString(R.string.validation_quality_not_sensible)
+            val dimensionMessage = getString(R.string.validation_dimension_not_sensible)
+            binding.validationMessage.text =
+                getString(R.string.text_concat_newline, qualityMessage, dimensionMessage)
+        }
+    }
+
+    private fun validateQuality(): ValidatedNumber {
+
+        if (!binding.settingQualityLayout.isEnabled) {
+            return ValidatedNumber(true, 0)
+        }
+
+        val textInput = binding.settingQualityInput.text?.toString()?.takeIf { it.isNotEmpty() }
+            ?: return ValidatedNumber(false, Options.DEFAULT_JPEG_QUALITY)
+
+        val number = try {
+            textInput.toInt()
+        } catch (e: NumberFormatException) {
+            return ValidatedNumber(false, Options.DEFAULT_JPEG_QUALITY)
+        }
+
+        return when (number in 0..100) {
+            true -> ValidatedNumber(true, number)
+            false -> ValidatedNumber(false, Options.DEFAULT_JPEG_QUALITY)
+        }
+    }
+
+    private fun validateDimension(): ValidatedNumber {
+
+        if (!binding.settingPixelsLayout.isEnabled) {
+            return ValidatedNumber(true, 0)
+        }
+
+        val textInput = binding.settingPixelsInput.text?.toString()?.takeIf { it.isNotEmpty() }
+            ?: return ValidatedNumber(false, 0)
+
+        val number = try {
+            textInput.toInt()
+        } catch (e: NumberFormatException) {
+            return ValidatedNumber(false, 0)
+        }
+
+        return when (number) {
+            0 -> ValidatedNumber(false, 0)
+            else -> ValidatedNumber(true, number)
+        }
     }
 }

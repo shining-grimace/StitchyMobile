@@ -112,6 +112,16 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/validation_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/settings_menu_spacing"
+                android:textSize="18sp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="Validation message here" />
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

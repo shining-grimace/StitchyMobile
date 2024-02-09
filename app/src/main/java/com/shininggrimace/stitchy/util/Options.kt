@@ -23,7 +23,7 @@ data class Options(
             Options(
                 horizontal = true,
                 vertical = false,
-                quality = 0,
+                quality = DEFAULT_JPEG_QUALITY,
                 maxd = 0,
                 maxw = 0,
                 maxh = 0,
@@ -32,6 +32,8 @@ data class Options(
                 gif = false,
                 bmp = false
             )
+
+        const val DEFAULT_JPEG_QUALITY = 90
     }
 
     fun toJson(context: Context): Result<String> {
