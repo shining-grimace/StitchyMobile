@@ -39,13 +39,13 @@ interface ImageFiles {
     ) = activity().lifecycleScope.launch(Dispatchers.IO) {
 
         // Mark loading
-        viewModel.emitOutputState(
+        viewModel.postOutputState(
             ImagesViewModel.ProcessingState.Loading)
 
         // Open input files
         val inputFds = TypedFileDescriptors.fromPaths(activity(), uris)
             .onFailure {
-                viewModel.emitOutputState(
+                viewModel.postOutputState(
                     ImagesViewModel.ProcessingState.Failed,
                     it
                 )
@@ -58,7 +58,7 @@ interface ImageFiles {
             ?: Options.default()
         val inputOptionsJson = config.toJson(context)
             .onFailure {
-                viewModel.emitOutputState(
+                viewModel.postOutputState(
                     ImagesViewModel.ProcessingState.Failed,
                     it)
                 return@launch
@@ -69,7 +69,7 @@ interface ImageFiles {
         val outputFile = getTempOutputFile(config.getFileExtension())
         val outputFd = getRawFileDescriptor(outputFile)
             .onFailure {
-                viewModel.emitOutputState(
+                viewModel.postOutputState(
                     ImagesViewModel.ProcessingState.Failed,
                     it)
                 return@launch
@@ -84,14 +84,14 @@ interface ImageFiles {
             outputFd,
             config.getMimeType()
         ) ?: run {
-            viewModel.emitOutputState(
+            viewModel.postOutputState(
                 ImagesViewModel.ProcessingState.Completed,
                 outputFile.absolutePath)
             return@launch
         }
 
         // Update UI as completed
-        viewModel.emitOutputState(
+        viewModel.postOutputState(
             ImagesViewModel.ProcessingState.Failed,
             Exception(errorMessage))
     }

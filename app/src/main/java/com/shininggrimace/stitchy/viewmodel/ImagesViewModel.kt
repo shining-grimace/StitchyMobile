@@ -1,8 +1,9 @@
 package com.shininggrimace.stitchy.viewmodel
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class ImagesViewModel: ViewModel() {
 
@@ -18,18 +19,27 @@ class ImagesViewModel: ViewModel() {
         val data: Any
     )
 
-    val imageSelections: MutableStateFlow<List<Uri>> = MutableStateFlow(listOf())
-    val outputState: MutableStateFlow<OutputUpdate> = MutableStateFlow(
+    private val imageSelections: MutableLiveData<List<Uri>> = MutableLiveData(listOf())
+
+    private val outputState: MutableLiveData<OutputUpdate> = MutableLiveData(
         OutputUpdate(ProcessingState.Empty, Unit))
 
-    suspend fun emitOutputState(state: ProcessingState, data: Any) {
-        outputState.emit(
+    fun getImageSelections(): LiveData<List<Uri>> = imageSelections
+
+    fun postImageSelections(uris: List<Uri>) {
+        imageSelections.postValue(uris)
+    }
+
+    fun getOutputState(): LiveData<OutputUpdate> = outputState
+
+    fun postOutputState(state: ProcessingState, data: Any) {
+        outputState.postValue(
             OutputUpdate(state, data)
         )
     }
 
-    suspend fun emitOutputState(state: ProcessingState) {
-        outputState.emit(
+    fun postOutputState(state: ProcessingState) {
+        outputState.postValue(
             OutputUpdate(state, Unit)
         )
     }

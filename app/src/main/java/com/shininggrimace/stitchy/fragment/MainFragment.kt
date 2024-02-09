@@ -18,7 +18,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -28,7 +27,6 @@ import com.shininggrimace.stitchy.databinding.FragmentMainBinding
 import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.util.ExportResult
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
@@ -41,6 +39,8 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
 
     private lateinit var pickImages: ActivityResultLauncher<PickVisualMediaRequest>
 
+    private val viewModel: ImagesViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,16 +48,11 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
     ): View {
         (activity as? MenuHost)?.addMenuProvider(this)
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        val viewModel: ImagesViewModel by activityViewModels()
-        lifecycleScope.launch {
-            viewModel.imageSelections.collect { uris ->
-                showImageSelections(uris)
-            }
+        viewModel.getImageSelections().observe(viewLifecycleOwner) { uris ->
+            showImageSelections(uris)
         }
-        lifecycleScope.launch {
-            viewModel.outputState.collect { (state, payload) ->
-                updateOutputState(state, payload)
-            }
+        viewModel.getOutputState().observe(viewLifecycleOwner) { (state, payload) ->
+            updateOutputState(state, payload)
         }
         binding.clearImagesFab.setOnClickListener {
             clearInputs()
@@ -108,15 +103,14 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         if (uris.isEmpty()) {
             return@ActivityResultCallback
         }
-        val viewModel: ImagesViewModel by activityViewModels()
-        val totalList = viewModel.imageSelections.value + uris
-        viewModel.imageSelections.tryEmit(totalList)
+        val existingList = viewModel.getImageSelections().value ?: emptyList()
+        val totalList = existingList + uris
+        viewModel.postImageSelections(totalList)
         processImageFiles(requireActivity(), viewModel, totalList)
     }
 
     private fun clearInputs() {
-        val viewModel: ImagesViewModel by activityViewModels()
-        viewModel.imageSelections.tryEmit(listOf())
+        viewModel.postImageSelections(listOf())
     }
 
     private fun showImageSelections(images: List<Uri>) {
@@ -131,8 +125,8 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
     }
 
     private fun exportOutputFile(): Result<ExportResult> {
-        val viewModel: ImagesViewModel by activityViewModels()
-        val outputState = viewModel.outputState.value
+        val outputState = viewModel.getOutputState().value
+            ?: ImagesViewModel.OutputUpdate(ImagesViewModel.ProcessingState.Empty, Unit)
         if (outputState.state != ImagesViewModel.ProcessingState.Completed) {
             Timber.e("The stitch output doesn't appear to be ready")
             return Result.failure(Exception(
