@@ -51,11 +51,16 @@ dependencies {
 
 tasks.register<Exec>("compileRust") {
     commandLine("cargo", "build", "--target", "aarch64-linux-android", "--release", "--manifest-path", "../rust/Cargo.toml")
+    commandLine("cargo", "build", "--target", "x86_64-linux-android", "--release", "--manifest-path", "../rust/Cargo.toml")
 
     doLast {
         project.copy {
             from("../rust/target/aarch64-linux-android/release/librust.so")
             into("src/main/jniLibs/arm64-v8a")
+        }
+        project.copy {
+            from("../rust/target/x86_64-linux-android/release/librust.so")
+            into("src/main/jniLibs/x86_64")
         }
         println("Rust compiler completed")
     }
