@@ -125,9 +125,10 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
 
     private fun showImageSelections(images: List<Uri>) {
         val context = context ?: return
+        val gridColumns = context.resources.getInteger(R.integer.grid_columns)
         if (images.isNotEmpty()) {
             binding.selectedFiles.visibility = View.VISIBLE
-            binding.selectedFiles.layoutManager = GridLayoutManager(context, 2)
+            binding.selectedFiles.layoutManager = GridLayoutManager(context, gridColumns)
             binding.selectedFiles.adapter = ImageAdapter(images)
         } else {
             binding.selectedFiles.visibility = View.INVISIBLE
