@@ -50,8 +50,12 @@
         android:id="@+id/selected_files"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/stitch_preview"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintWidth_max="@dimen/max_content_width"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/clear_images_fab"
