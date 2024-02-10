@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.MainFragment">
+
+    <ImageView
+        android:id="@+id/stitch_preview"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/acc_stitch_preview"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintDimensionRatio="0.5625" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/export_output_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/acc_export_generated"
+        app:srcCompat="@drawable/ic_action_publish"
+        app:layout_constraintBottom_toBottomOf="@id/stitch_preview"
+        app:layout_constraintEnd_toEndOf="@id/stitch_preview" />
+
+    <ProgressBar
+        android:id="@+id/output_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/stitch_preview"
+        app:layout_constraintBottom_toBottomOf="@id/stitch_preview"
+        app:layout_constraintStart_toStartOf="@id/stitch_preview"
+        app:layout_constraintEnd_toEndOf="@id/stitch_preview" />
+
+    <TextView
+        android:id="@+id/output_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        app:layout_constraintTop_toTopOf="@id/stitch_preview"
+        app:layout_constraintBottom_toBottomOf="@id/stitch_preview"
+        app:layout_constraintStart_toStartOf="@id/stitch_preview"
+        app:layout_constraintEnd_toEndOf="@id/stitch_preview" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/selected_files"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toEndOf="@id/stitch_preview"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/clear_images_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/acc_select_images"
+        app:srcCompat="@drawable/ic_action_delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/select_images_fab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/select_images_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/acc_select_images"
+        app:srcCompat="@drawable/ic_action_library_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
