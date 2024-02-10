@@ -1,8 +1,11 @@
 package com.shininggrimace.stitchy.fragment
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,6 +18,7 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -38,6 +42,7 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
     private val binding get() = _binding!!
 
     private lateinit var pickImages: ActivityResultLauncher<PickVisualMediaRequest>
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     private val viewModel: ImagesViewModel by activityViewModels()
 
@@ -65,9 +70,14 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         pickImages = registerForActivityResult(
             ActivityResultContracts.PickMultipleVisualMedia(),
             onInputsSelected)
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    exportGivenPermission()
+                }
+            }
         binding.exportOutputFab.setOnClickListener {
-            processExportResult(
-                exportOutputFile())
+            checkPermissionAndExport()
         }
         return binding.root
     }
@@ -122,6 +132,30 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         } else {
             binding.selectedFiles.visibility = View.INVISIBLE
         }
+    }
+
+    private fun checkPermissionAndExport() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            exportGivenPermission()
+            return
+        }
+
+        val permissionResult = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        if (permissionResult == PackageManager.PERMISSION_GRANTED) {
+            exportGivenPermission()
+            return
+        }
+
+        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+
+    private fun exportGivenPermission() {
+        processExportResult(
+            exportOutputFile())
     }
 
     private fun exportOutputFile(): Result<ExportResult> {
