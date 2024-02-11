@@ -99,7 +99,6 @@
                 android:id="@+id/setting_pixels_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:enabled="false"
                 android:labelFor="@id/setting_pixels_input"
                 android:hint="@string/input_pixels">
 

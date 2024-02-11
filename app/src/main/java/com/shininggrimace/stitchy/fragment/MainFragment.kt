@@ -3,7 +3,6 @@ package com.shininggrimace.stitchy.fragment
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -24,6 +23,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.adapter.ImageAdapter
@@ -32,6 +32,7 @@ import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.util.ExportResult
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import timber.log.Timber
+import java.io.File
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -216,11 +217,7 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
                 binding.outputLoading.visibility = View.GONE
                 binding.outputLabel.visibility = View.GONE
                 binding.stitchPreview.visibility = View.VISIBLE
-                (payload as? String)?.let { file ->
-                    binding.stitchPreview.setImageBitmap(
-                        BitmapFactory.decodeFile(file)
-                    )
-                }
+                displayOutputPayload(payload)
             }
             ImagesViewModel.ProcessingState.Failed -> {
                 binding.exportOutputFab.visibility = View.GONE
@@ -231,5 +228,10 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
                     ?: getString(R.string.no_message_generated)
             }
         }
+    }
+
+    private fun displayOutputPayload(payload: Any) {
+        val file = payload as? String ?: return
+        binding.stitchPreview.load(File(file))
     }
 }

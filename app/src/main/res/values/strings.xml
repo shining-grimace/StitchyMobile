@@ -30,7 +30,7 @@
     <string name="acc_export_generated">Export the generated image</string>
 
     <!-- Validation -->
-    <string name="validation_dimension_not_sensible">This dimension limit is invalid and will be reverted to None</string>
+    <string name="validation_dimension_not_sensible">This dimension limit is invalid and will be reverted to 4,096</string>
     <string name="validation_quality_not_sensible">This quality is not valid and will be reverted to the default of 90</string>
 
     <!-- Errors -->
@@ -56,7 +56,6 @@
         <item>Vertical</item>
     </string-array>
     <string-array name="setting_size_limit_items">
-        <item>None</item>
         <item>Both</item>
         <item>Width</item>
         <item>Height</item>

@@ -99,10 +99,6 @@ class SettingsFragment : Fragment(), MenuProvider {
         binding.settingQualityInput.doOnTextChanged { _, _, _, _ ->
             updateValidationMessage()
         }
-        binding.settingSizeLimitInput.setOnItemClickListener { _, _, position, _ ->
-            binding.settingPixelsLayout.isEnabled = position != 0
-            updateValidationMessage()
-        }
         binding.settingPixelsInput.doOnTextChanged { _, _, _, _ ->
             updateValidationMessage()
         }
@@ -154,23 +150,19 @@ class SettingsFragment : Fragment(), MenuProvider {
 
         val sizeLimitPosition = when {
             options.maxd > 0 -> {
-                binding.settingPixelsLayout.isEnabled = true
                 binding.settingPixelsInput.setText(options.maxd.toString())
-                1
+                0
             }
             options.maxw > 0 -> {
-                binding.settingPixelsLayout.isEnabled = true
                 binding.settingPixelsInput.setText(options.maxw.toString())
-                2
+                1
             }
             options.maxh > 0 -> {
-                binding.settingPixelsLayout.isEnabled = true
                 binding.settingPixelsInput.setText(options.maxh.toString())
-                3
+                2
             }
             else -> {
-                binding.settingPixelsLayout.isEnabled = false
-                binding.settingPixelsInput.setText(0.toString())
+                binding.settingPixelsInput.setText(Options.MAX_DIMENSION.toString())
                 0
             }
         }
@@ -216,9 +208,9 @@ class SettingsFragment : Fragment(), MenuProvider {
             horizontal = arrangementPosition == 1,
             vertical = arrangementPosition == 2,
             quality = qualityNumber,
-            maxd = pixelsNumber.takeIf { sizeLimitPosition == 1 } ?: 0,
-            maxw = pixelsNumber.takeIf { sizeLimitPosition == 2 } ?: 0,
-            maxh = pixelsNumber.takeIf { sizeLimitPosition == 3 } ?: 0,
+            maxd = pixelsNumber.takeIf { sizeLimitPosition == 0 } ?: 0,
+            maxw = pixelsNumber.takeIf { sizeLimitPosition == 1 } ?: 0,
+            maxh = pixelsNumber.takeIf { sizeLimitPosition == 2 } ?: 0,
             jpeg = formatPosition == 0,
             png = formatPosition == 1,
             gif = formatPosition == 2,
@@ -273,22 +265,18 @@ class SettingsFragment : Fragment(), MenuProvider {
 
     private fun validateDimension(): ValidatedNumber {
 
-        if (!binding.settingPixelsLayout.isEnabled) {
-            return ValidatedNumber(true, 0)
-        }
-
         val textInput = binding.settingPixelsInput.text?.toString()?.takeIf { it.isNotEmpty() }
-            ?: return ValidatedNumber(false, 0)
+            ?: return ValidatedNumber(false, Options.MAX_DIMENSION)
 
         val number = try {
             textInput.toInt()
         } catch (e: NumberFormatException) {
-            return ValidatedNumber(false, 0)
+            return ValidatedNumber(false, Options.MAX_DIMENSION)
         }
 
-        return when (number) {
-            0 -> ValidatedNumber(false, 0)
-            else -> ValidatedNumber(true, number)
+        return when (number in 1..4096) {
+            true -> ValidatedNumber(true, number)
+            false -> ValidatedNumber(false, Options.MAX_DIMENSION)
         }
     }
 }
