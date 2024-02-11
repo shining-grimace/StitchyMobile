@@ -30,7 +30,10 @@ import com.shininggrimace.stitchy.adapter.ImageAdapter
 import com.shininggrimace.stitchy.databinding.FragmentMainBinding
 import com.shininggrimace.stitchy.trait.ImageFiles
 import com.shininggrimace.stitchy.util.ExportResult
+import com.shininggrimace.stitchy.util.Options
+import com.shininggrimace.stitchy.util.OptionsRepository
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
+import kotlinx.coroutines.Job
 import timber.log.Timber
 import java.io.File
 
@@ -46,6 +49,9 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     private val viewModel: ImagesViewModel by activityViewModels()
+
+    private var lastOptionsUsed: String? = null
+    private var lastJobStarted: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,6 +100,38 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // Determine whether options changed; if not then return
+        val previousOptionsJson = lastOptionsUsed ?: return
+        val currentState = viewModel.getOutputState().value ?: return
+        val currentOptions = OptionsRepository.getOptions(requireContext())
+            ?: Options.default()
+        val currentOptionsJson = currentOptions.toJson(requireContext()).getOrNull() ?: return
+        if (previousOptionsJson == currentOptionsJson) {
+            return
+        }
+
+        // If a stitch result is active it should be replaced because of the options change
+        when (currentState.state) {
+            ImagesViewModel.ProcessingState.Empty -> return
+            ImagesViewModel.ProcessingState.Completed, ImagesViewModel.ProcessingState.Failed -> {
+                val existingList = viewModel.getImageSelections().value ?: return
+                lastJobStarted = processImageFiles(requireActivity(), viewModel, existingList) {
+                    lastOptionsUsed = it
+                }
+            }
+            ImagesViewModel.ProcessingState.Loading -> {
+                lastJobStarted?.cancel()
+                val existingList = viewModel.getImageSelections().value ?: return
+                lastJobStarted = processImageFiles(requireActivity(), viewModel, existingList) {
+                    lastOptionsUsed = it
+                }
+            }
+        }
+    }
+
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menu.clear()
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -117,7 +155,9 @@ class MainFragment : Fragment(), MenuProvider, ImageFiles {
         val existingList = viewModel.getImageSelections().value ?: emptyList()
         val totalList = existingList + uris
         viewModel.postImageSelections(totalList)
-        processImageFiles(requireActivity(), viewModel, totalList)
+        lastJobStarted = processImageFiles(requireActivity(), viewModel, totalList) {
+            lastOptionsUsed = it
+        }
     }
 
     private fun clearInputs() {

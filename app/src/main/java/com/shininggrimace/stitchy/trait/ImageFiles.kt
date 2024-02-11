@@ -17,6 +17,7 @@ import com.shininggrimace.stitchy.util.OptionsRepository
 import com.shininggrimace.stitchy.util.TypedFileDescriptors
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -35,7 +36,8 @@ interface ImageFiles {
     fun processImageFiles(
         context: Context,
         viewModel: ImagesViewModel,
-        uris: List<Uri>
+        uris: List<Uri>,
+        onStitchBegin: (optionsJson: String) -> Unit
     ) = activity().lifecycleScope.launch(Dispatchers.IO) {
 
         // Mark loading
@@ -76,7 +78,13 @@ interface ImageFiles {
             }
             .getOrThrow()
 
+        // Check if cancelled
+        if (!isActive) {
+            return@launch
+        }
+
         // Run Stitchy
+        onStitchBegin(inputOptionsJson)
         val errorMessage = MainActivity.runStitchy(
             inputOptionsJson,
             inputFds.fileFds,
@@ -84,9 +92,17 @@ interface ImageFiles {
             outputFd,
             config.getMimeType()
         ) ?: run {
-            viewModel.postOutputState(
-                ImagesViewModel.ProcessingState.Completed,
-                outputFile.absolutePath)
+            if (isActive) {
+                viewModel.postOutputState(
+                    ImagesViewModel.ProcessingState.Completed,
+                    outputFile.absolutePath
+                )
+            }
+            return@launch
+        }
+
+        // Check if cancelled
+        if (!isActive) {
             return@launch
         }
 
