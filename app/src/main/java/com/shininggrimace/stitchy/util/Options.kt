@@ -1,11 +1,13 @@
 package com.shininggrimace.stitchy.util
 
 import android.content.Context
+import androidx.annotation.Keep
 import com.shininggrimace.stitchy.R
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
 
+@Keep
 data class Options(
     val horizontal: Boolean,
     val vertical: Boolean,
