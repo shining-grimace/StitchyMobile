@@ -1,5 +1,8 @@
 package com.shininggrimace.stitchy.fragment
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -20,6 +23,8 @@ import com.shininggrimace.stitchy.util.Options
 import com.shininggrimace.stitchy.util.OptionsRepository
 import timber.log.Timber
 import java.lang.NumberFormatException
+
+private const val DEVELOPER_LINK_URL = "https://shininggrimace.com"
 
 class SettingsFragment : Fragment(), MenuProvider {
 
@@ -101,6 +106,9 @@ class SettingsFragment : Fragment(), MenuProvider {
         }
         binding.settingPixelsInput.doOnTextChanged { _, _, _, _ ->
             updateValidationMessage()
+        }
+        binding.openWebsite.setOnClickListener {
+            openWebsite()
         }
     }
 
@@ -277,6 +285,17 @@ class SettingsFragment : Fragment(), MenuProvider {
         return when (number in 1..4096) {
             true -> ValidatedNumber(true, number)
             false -> ValidatedNumber(false, Options.MAX_DIMENSION)
+        }
+    }
+
+    private fun openWebsite() {
+        val activity = requireActivity()
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(DEVELOPER_LINK_URL))
+        val resolvedActivities = activity.packageManager.queryIntentActivities(
+            intent,
+            PackageManager.MATCH_ALL)
+        if (resolvedActivities.isNotEmpty()) {
+            activity.startActivity(intent)
         }
     }
 }

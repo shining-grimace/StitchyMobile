@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,122 +7,140 @@
     android:layout_height="match_parent"
     tools:context=".fragment.SettingsFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@id/open_website"
+        tools:context=".fragment.SettingsFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/content_edge_padding"
+            android:paddingEnd="@dimen/content_edge_padding">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/content_edge_padding"
+                android:paddingBottom="@dimen/content_edge_padding"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintWidth_max="@dimen/max_content_width">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_format_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/setting_format_input"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:hint="@string/input_format">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/setting_format_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        app:simpleItems="@array/setting_format_items" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_quality_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:labelFor="@id/setting_quality_input"
+                    android:hint="@string/input_quality">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/setting_quality_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_arrangement_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_spacing"
+                    android:labelFor="@id/setting_arrangement_input"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:hint="@string/input_arrangement">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/setting_arrangement_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        app:simpleItems="@array/setting_arrangement_items" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_size_limit_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_spacing"
+                    android:labelFor="@id/setting_size_limit_input"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:hint="@string/input_size_limit">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/setting_size_limit_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        app:simpleItems="@array/setting_size_limit_items" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_pixels_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/setting_pixels_input"
+                    android:hint="@string/input_pixels">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/setting_pixels_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="number" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/validation_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_spacing"
+                    android:textSize="18sp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="Validation message here" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/open_website"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/content_edge_padding"
-        android:paddingEnd="@dimen/content_edge_padding">
+        android:padding="@dimen/content_edge_padding"
+        android:layout_marginBottom="@dimen/content_edge_padding"
+        android:text="@string/stitchy_website"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/content_edge_padding"
-            android:paddingBottom="@dimen/content_edge_padding"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintWidth_max="@dimen/max_content_width">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/setting_format_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:labelFor="@id/setting_format_input"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:hint="@string/input_format">
-
-                <AutoCompleteTextView
-                    android:id="@+id/setting_format_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    app:simpleItems="@array/setting_format_items" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/setting_quality_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:labelFor="@id/setting_quality_input"
-                android:hint="@string/input_quality">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/setting_quality_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
-                    android:inputType="number" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/setting_arrangement_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/settings_menu_spacing"
-                android:labelFor="@id/setting_arrangement_input"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:hint="@string/input_arrangement">
-
-                <AutoCompleteTextView
-                    android:id="@+id/setting_arrangement_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    app:simpleItems="@array/setting_arrangement_items" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/setting_size_limit_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/settings_menu_spacing"
-                android:labelFor="@id/setting_size_limit_input"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:hint="@string/input_size_limit">
-
-                <AutoCompleteTextView
-                    android:id="@+id/setting_size_limit_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    app:simpleItems="@array/setting_size_limit_items" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/setting_pixels_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:labelFor="@id/setting_pixels_input"
-                android:hint="@string/input_pixels">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/setting_pixels_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
-                    android:inputType="number" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/validation_message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/settings_menu_spacing"
-                android:textSize="18sp"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="Validation message here" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
