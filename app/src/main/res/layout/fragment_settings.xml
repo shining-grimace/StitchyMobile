@@ -10,7 +10,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@id/open_website"
+        app:layout_constraintBottom_toTopOf="@id/bottom_ui"
         tools:context=".fragment.SettingsFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -134,28 +134,31 @@
     </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
+        android:id="@+id/bottom_ui"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:clipToPadding="false"
         android:padding="@dimen/content_edge_padding"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/version_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/content_edge_padding"
+            android:paddingTop="@dimen/content_edge_padding"
+            android:paddingBottom="@dimen/content_edge_padding"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/open_website"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:elevation="2dp"
             android:padding="@dimen/content_edge_padding"
             android:text="@string/developer_website"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            android:textSize="16sp" />
 
     </LinearLayout>
 
