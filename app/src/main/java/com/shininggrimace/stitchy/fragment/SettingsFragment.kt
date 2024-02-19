@@ -119,33 +119,29 @@ class SettingsFragment : Fragment(), MenuProvider {
         val formatPosition = when {
             options.jpeg -> {
                 binding.settingQualityLayout.isEnabled = true
-                binding.settingQualityInput.setText(options.quality.toString())
                 0
             }
             options.png -> {
                 binding.settingQualityLayout.isEnabled = false
-                binding.settingQualityInput.setText(0.toString())
                 1
             }
             options.gif -> {
                 binding.settingQualityLayout.isEnabled = false
-                binding.settingQualityInput.setText(0.toString())
                 2
             }
             options.bmp -> {
                 binding.settingQualityLayout.isEnabled = false
-                binding.settingQualityInput.setText(0.toString())
                 3
             }
             else -> {
                 binding.settingQualityLayout.isEnabled = false
-                binding.settingQualityInput.setText(0.toString())
                 1
             }
         }
         val formatText = binding.settingFormatInput.adapter
             .getItem(formatPosition).toString()
         binding.settingFormatInput.setText(formatText, false)
+        binding.settingQualityInput.setText(options.quality.toString())
 
         val arrangementPosition = when {
             options.horizontal -> 1
