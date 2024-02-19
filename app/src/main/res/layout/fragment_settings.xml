@@ -139,7 +139,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/content_edge_padding"
         android:layout_marginBottom="@dimen/content_edge_padding"
-        android:text="@string/stitchy_website"
+        android:text="@string/developer_website"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent" />
 

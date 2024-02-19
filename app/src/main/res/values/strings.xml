@@ -16,7 +16,7 @@
     <!-- Actions -->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="stitchy_website">Stitchy website</string>
+    <string name="developer_website">Developer website</string>
 
     <!-- Descriptions -->
     <string name="no_images_selected">No images selected</string>
