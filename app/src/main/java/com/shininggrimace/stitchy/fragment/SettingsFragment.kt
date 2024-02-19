@@ -17,6 +17,7 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
+import com.shininggrimace.stitchy.BuildConfig
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.databinding.FragmentSettingsBinding
 import com.shininggrimace.stitchy.util.Options
@@ -48,6 +49,7 @@ class SettingsFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configureLabels()
         applyListeners()
         prefillOptions()
     }
@@ -94,6 +96,10 @@ class SettingsFragment : Fragment(), MenuProvider {
                 return false
             }
         return true
+    }
+
+    private fun configureLabels() {
+        binding.versionLabel.text = getString(R.string.app_with_version, BuildConfig.VERSION_NAME)
     }
 
     private fun applyListeners() {
