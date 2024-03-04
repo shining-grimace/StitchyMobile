@@ -147,7 +147,12 @@ class SettingsFragment : Fragment(), MenuProvider {
         val formatText = binding.settingFormatInput.adapter
             .getItem(formatPosition).toString()
         binding.settingFormatInput.setText(formatText, false)
-        binding.settingQualityInput.setText(options.quality.toString())
+
+        if (options.jpeg) {
+            binding.settingQualityInput.setText(options.quality.toString())
+        } else {
+            binding.settingQualityInput.setText(Options.DEFAULT_JPEG_QUALITY.toString())
+        }
 
         val arrangementPosition = when {
             options.horizontal -> 1
