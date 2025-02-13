@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import coil3.load
 import com.shininggrimace.stitchy.R
 import timber.log.Timber
 
@@ -25,7 +25,7 @@ class ImageViewHolder(view: View): RecyclerView.ViewHolder(view) {
             listener(
                 onStart = { showLoadingState() },
                 onCancel = { showErrorState(null) },
-                onError = { _, throwable -> showErrorState(throwable) },
+                onError = { _, result -> showErrorState(result.throwable) },
                 onSuccess = { _, _ -> showImageLoadedState() }
             )
         }

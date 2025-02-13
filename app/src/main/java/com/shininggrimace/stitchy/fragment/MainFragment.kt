@@ -23,7 +23,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import coil.load
+import coil3.load
 import com.google.android.material.snackbar.Snackbar
 import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.adapter.ImageAdapter
