@@ -1,6 +1,9 @@
 
 ### Unreleased
 
+- Update `stitchy-core` dependency to 0.1.4, which brings these updates:
+  - Fixed more failures to process files
+  - Apply rotation metadata so images are oriented correctly (JPEG and WebP)
 - Support WebP (lossless only)
 - Add 'small mode' that encodes the smallest file possible (at the expense of speed); applies only
   to PNG and GIF
