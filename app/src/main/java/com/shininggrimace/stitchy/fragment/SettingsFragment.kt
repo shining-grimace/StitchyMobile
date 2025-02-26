@@ -105,12 +105,27 @@ class SettingsFragment : Fragment(), MenuProvider {
     private fun applyListeners() {
         binding.settingFormatInput.setOnItemClickListener { _, _, position, _ ->
             binding.settingQualityLayout.isEnabled = position == 0
+            binding.settingCompressionLayout.isEnabled = position == 1 || position == 2
+            if (position == 1 || position == 2) {
+                binding.settingCompressionLayout.isEnabled = true
+            } else {
+                binding.settingCompressionLayout.isEnabled = false
+                binding.settingCompressionInput.setText(
+                    resources.getStringArray(R.array.setting_compression_items)[0]
+                )
+            }
             updateValidationMessage()
         }
         binding.settingQualityInput.doOnTextChanged { _, _, _, _ ->
             updateValidationMessage()
         }
         binding.settingPixelsInput.doOnTextChanged { _, _, _, _ ->
+            updateValidationMessage()
+        }
+        binding.settingCompressionInput.setOnItemClickListener { _, _, _, _ ->
+            updateValidationMessage()
+        }
+        binding.settingFastInput.setOnItemClickListener { _, _, _, _ ->
             updateValidationMessage()
         }
         binding.openWebsite.setOnClickListener {
@@ -125,22 +140,32 @@ class SettingsFragment : Fragment(), MenuProvider {
         val formatPosition = when {
             options.jpeg -> {
                 binding.settingQualityLayout.isEnabled = true
+                binding.settingCompressionLayout.isEnabled = false
                 0
             }
             options.png -> {
                 binding.settingQualityLayout.isEnabled = false
+                binding.settingCompressionLayout.isEnabled = true
                 1
             }
             options.gif -> {
                 binding.settingQualityLayout.isEnabled = false
+                binding.settingCompressionLayout.isEnabled = true
                 2
             }
             options.bmp -> {
                 binding.settingQualityLayout.isEnabled = false
+                binding.settingCompressionLayout.isEnabled = false
                 3
+            }
+            options.webp -> {
+                binding.settingQualityLayout.isEnabled = false
+                binding.settingCompressionLayout.isEnabled = false
+                4
             }
             else -> {
                 binding.settingQualityLayout.isEnabled = false
+                binding.settingCompressionLayout.isEnabled = true
                 1
             }
         }
@@ -184,6 +209,22 @@ class SettingsFragment : Fragment(), MenuProvider {
         val sizeLimitText = binding.settingSizeLimitInput.adapter
             .getItem(sizeLimitPosition).toString()
         binding.settingSizeLimitInput.setText(sizeLimitText, false)
+
+        val compressionPosition = when ((options.png || options.gif) && options.small) {
+            true -> 1
+            false -> 0
+        }
+        val compressionText = binding.settingCompressionInput.adapter
+            .getItem(compressionPosition).toString()
+        binding.settingCompressionInput.setText(compressionText, false)
+
+        val fastPosition = when (options.fast) {
+            true -> 1
+            false -> 0
+        }
+        val fastText = binding.settingFastInput.adapter
+            .getItem(fastPosition).toString()
+        binding.settingFastInput.setText(fastText, false)
     }
 
     private fun retrieveOptions(): Result<Options> {
@@ -219,17 +260,38 @@ class SettingsFragment : Fragment(), MenuProvider {
 
         val pixelsNumber = validateDimension().resultingNumber
 
+        val compressionText = binding.settingCompressionInput.text.toString()
+        val compressionStrings = resources.getStringArray(R.array.setting_compression_items)
+        val compressionPosition = compressionStrings.indexOf(compressionText)
+        if (compressionPosition < 0) {
+            Timber.e("Cannot find selected compression option")
+            return Result.failure(Exception(
+                getString(R.string.error_parsing_setting)))
+        }
+
+        val fastText = binding.settingFastInput.text.toString()
+        val fastStrings = resources.getStringArray(R.array.setting_fast_items)
+        val fastPosition = fastStrings.indexOf(fastText)
+        if (fastPosition < 0) {
+            Timber.e("Cannot find selected fast option")
+            return Result.failure(Exception(
+                getString(R.string.error_parsing_setting)))
+        }
+
         val options = Options(
             horizontal = arrangementPosition == 1,
             vertical = arrangementPosition == 2,
             quality = qualityNumber,
+            small = compressionPosition == 1,
+            fast = fastPosition == 1,
             maxd = pixelsNumber.takeIf { sizeLimitPosition == 0 } ?: 0,
             maxw = pixelsNumber.takeIf { sizeLimitPosition == 1 } ?: 0,
             maxh = pixelsNumber.takeIf { sizeLimitPosition == 2 } ?: 0,
             jpeg = formatPosition == 0,
             png = formatPosition == 1,
             gif = formatPosition == 2,
-            bmp = formatPosition == 3
+            bmp = formatPosition == 3,
+            webp = formatPosition == 4
         )
         return Result.success(options)
     }

@@ -13,6 +13,8 @@
     <string name="input_arrangement">Arrangement</string>
     <string name="input_size_limit">Limit Dimensions</string>
     <string name="input_pixels">Pixels</string>
+    <string name="input_compression">Compression</string>
+    <string name="input_fast">Copy Filter</string>
 
     <!-- Actions -->
     <string name="next">Next</string>
@@ -51,6 +53,7 @@
         <item>PNG</item>
         <item>GIF</item>
         <item>BMP</item>
+        <item>WebP</item>
     </string-array>
     <string-array name="setting_arrangement_items">
         <item>Grid</item>
@@ -61,6 +64,14 @@
         <item>Both</item>
         <item>Width</item>
         <item>Height</item>
+    </string-array>
+    <string-array name="setting_compression_items">
+        <item>Fastest</item>
+        <item>Smallest</item>
+    </string-array>
+    <string-array name="setting_fast_items">
+        <item>Nicest</item>
+        <item>Fastest</item>
     </string-array>
 
 </resources>

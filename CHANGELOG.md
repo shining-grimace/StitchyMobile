@@ -1,4 +1,11 @@
 
+### Unreleased
+
+- Support WebP (lossless only)
+- Add 'small mode' that encodes the smallest file possible (at the expense of speed); applies only
+  to PNG and GIF
+- Add 'fast mode' that uses nearest-neighbour filtering when copying files (fast but lower quality)
+
 ### 1.0.1 (May 11, 2024)
 
 - Changed app display name to "Stitchy"

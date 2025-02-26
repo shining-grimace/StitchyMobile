@@ -11,6 +11,8 @@ import timber.log.Timber
 data class Options(
     val horizontal: Boolean,
     val vertical: Boolean,
+    val small: Boolean,
+    val fast: Boolean,
     val quality: Int,
     val maxd: Int,
     val maxw: Int,
@@ -18,13 +20,16 @@ data class Options(
     val jpeg: Boolean,
     val png: Boolean,
     val gif: Boolean,
-    val bmp: Boolean
+    val bmp: Boolean,
+    val webp: Boolean
 ) {
     companion object {
         fun default(): Options =
             Options(
                 horizontal = true,
                 vertical = false,
+                small = false,
+                fast = false,
                 quality = DEFAULT_JPEG_QUALITY,
                 maxd = MAX_DIMENSION,
                 maxw = 0,
@@ -32,7 +37,8 @@ data class Options(
                 jpeg = false,
                 png = true,
                 gif = false,
-                bmp = false
+                bmp = false,
+                webp = false
             )
 
         const val DEFAULT_JPEG_QUALITY = 90
@@ -59,6 +65,7 @@ data class Options(
         png -> "png"
         gif -> "gif"
         bmp -> "bmp"
+        webp -> "webp"
         else -> "png"
     }
 
@@ -67,6 +74,7 @@ data class Options(
         png -> "image/png"
         gif -> "image/gif"
         bmp -> "image/bmp"
+        webp -> "image/webp"
         else -> "image/png"
     }
 }

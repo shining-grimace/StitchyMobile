@@ -117,6 +117,42 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_compression_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_spacing"
+                    android:labelFor="@id/setting_compression_input"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:hint="@string/input_compression">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/setting_compression_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        app:simpleItems="@array/setting_compression_items" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/setting_fast_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_spacing"
+                    android:labelFor="@id/setting_fast_input"
+                    style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                    android:hint="@string/input_fast">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/setting_fast_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        app:simpleItems="@array/setting_fast_items" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <TextView
                     android:id="@+id/validation_message"
                     android:layout_width="match_parent"

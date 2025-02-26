@@ -7,6 +7,8 @@ pub struct Options {
     pub horizontal: bool,
     pub vertical: bool,
     pub quality: u32,
+    pub small: bool,
+    pub fast: bool,
     pub maxd: u32,
     pub maxw: u32,
     pub maxh: u32
