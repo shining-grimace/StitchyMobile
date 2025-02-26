@@ -52,6 +52,7 @@
                     android:id="@+id/setting_quality_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_related_spacing"
                     android:enabled="false"
                     android:labelFor="@id/setting_quality_input"
                     android:hint="@string/input_quality">
@@ -105,6 +106,7 @@
                     android:id="@+id/setting_pixels_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/settings_menu_related_spacing"
                     android:labelFor="@id/setting_pixels_input"
                     android:hint="@string/input_pixels">
 

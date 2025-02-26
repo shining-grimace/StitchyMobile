@@ -11,10 +11,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
 import com.shininggrimace.stitchy.BuildConfig
@@ -52,6 +56,12 @@ class SettingsFragment : Fragment(), MenuProvider {
         configureLabels()
         applyListeners()
         prefillOptions()
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomUi) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val basePadding = resources.getDimension(R.dimen.content_edge_padding).toInt()
+            v.setPadding(basePadding, basePadding, basePadding, basePadding + insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     override fun onDestroyView() {

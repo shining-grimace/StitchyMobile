@@ -1,6 +1,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="settings_menu_spacing">32dp</dimen>
+    <dimen name="settings_menu_related_spacing">8dp</dimen>
     <dimen name="content_edge_padding">16dp</dimen>
     <dimen name="max_content_width">480dp</dimen>
 </resources>
