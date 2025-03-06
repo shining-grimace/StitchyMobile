@@ -1,5 +1,8 @@
-
-use jni::{JNIEnv, objects::{JClass, JObject, JValue}};
+use crate::Error;
+use jni::{
+    objects::{JClass, JObject, JValue},
+    JNIEnv,
+};
 
 pub struct Logger<'a, 'b> {
     env: &'a mut JNIEnv<'b>,
@@ -8,8 +11,7 @@ pub struct Logger<'a, 'b> {
 }
 
 impl<'a, 'b> Logger<'a, 'b> {
-
-    pub fn new(env: &'a mut JNIEnv<'b>) -> Result<Self, jni::errors::Error> {
+    pub fn new(env: &'a mut JNIEnv<'b>) -> Result<Self, Error> {
         let log_class = env.find_class("android/util/Log")?;
         let tag_string = JObject::from(env.new_string("StitchyMobile")?);
         Ok(Self {
@@ -19,7 +21,7 @@ impl<'a, 'b> Logger<'a, 'b> {
         })
     }
 
-    pub fn log_message(&mut self, message: &str) -> Result<(), jni::errors::Error> {
+    pub fn log_message(&mut self, message: &str) -> Result<(), Error> {
         let message_string = JObject::from(self.env.new_string(message)?);
         self.env.call_static_method(&self.log_class, "d", "(Ljava/lang/String;Ljava/lang/String;)I", &[
             JValue::Object(&self.tag_string),
