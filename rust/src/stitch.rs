@@ -1,32 +1,35 @@
 use crate::{Error, Logger, Options};
-use jni::{objects::AutoElements, sys::jint};
+use jni::sys::jint;
 use std::fs::File;
 use std::io::BufWriter;
+use std::time::SystemTime;
 use stitchy_core::{
     image::{
         DynamicImage, FilterType, Frame, GifEncoder, ImageFormat, JpegEncoder, PngCompressionType,
         PngEncoder, PngFilterType,
     },
-    FileLocation, FileProperties, ImageFiles, OwnedRawFdLocation, Stitch,
+    FileLocation, FileProperties, ImageFiles, OwnedRawFdLocation, RawBufferLocation, Stitch,
 };
 
-pub fn run_stitchy(
+pub fn run_stitchy<'a>(
     mut logger: Logger,
     options: Options,
-    input_fds: AutoElements<jint>,
+    input_buffers: Vec<&'a [u8]>,
     input_mimes: Vec<String>,
     output_fd: jint,
     output_mime: String,
 ) -> Result<(), Error> {
-    let mut images_builder = ImageFiles::builder();
 
-    for (i, fd) in input_fds.into_iter().enumerate() {
+    let mut images_builder = ImageFiles::builder();
+    let now = SystemTime::now();
+
+    for (i, buffer) in input_buffers.into_iter().enumerate() {
         if i >= input_mimes.len() {
             return Err(Error::Unknown(
                 "Internal error: mismatch in file data".to_owned(),
             ));
         }
-        let location = OwnedRawFdLocation::new(*fd, input_mimes[i].to_owned());
+        let location = RawBufferLocation::new(buffer, input_mimes[i].clone(), now.clone());
         images_builder = images_builder.add_file(location)?;
         logger.log_message("File added to ImageFiles")?;
     }

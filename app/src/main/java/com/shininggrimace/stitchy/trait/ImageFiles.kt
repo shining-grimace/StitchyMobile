@@ -14,7 +14,7 @@ import com.shininggrimace.stitchy.R
 import com.shininggrimace.stitchy.util.ExportResult
 import com.shininggrimace.stitchy.util.Options
 import com.shininggrimace.stitchy.util.OptionsRepository
-import com.shininggrimace.stitchy.util.TypedFileDescriptors
+import com.shininggrimace.stitchy.util.OpenedInputFiles
 import com.shininggrimace.stitchy.viewmodel.ImagesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -45,7 +45,7 @@ interface ImageFiles {
             ImagesViewModel.ProcessingState.Loading)
 
         // Open input files
-        val inputFds = TypedFileDescriptors.fromPaths(activity(), uris)
+        val inputResources = OpenedInputFiles.fromPaths(activity(), uris)
             .onFailure {
                 viewModel.postOutputState(
                     ImagesViewModel.ProcessingState.Failed,
@@ -87,11 +87,12 @@ interface ImageFiles {
         onStitchBegin(inputOptionsJson)
         val errorMessage = MainActivity.runStitchy(
             inputOptionsJson,
-            inputFds.fileFds,
-            inputFds.mimeTypes,
+            inputResources.getBuffers(),
+            inputResources.mimeTypes,
             outputFd,
             config.getMimeType()
         ) ?: run {
+            inputResources.closeAll()
             if (isActive) {
                 viewModel.postOutputState(
                     ImagesViewModel.ProcessingState.Completed,
@@ -100,6 +101,8 @@ interface ImageFiles {
             }
             return@launch
         }
+
+        inputResources.closeAll()
 
         // Check if cancelled
         if (!isActive) {

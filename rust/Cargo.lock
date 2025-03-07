@@ -341,9 +341,9 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 
 [[package]]
 name = "stitchy-core"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a3f466d7f9726d0858e1af797b893afea08dd0a0f9c582fbd45cb2f2621bd33"
+checksum = "09e21973de5824be1e18124a3c849f2a03e8bf5baeafa3667dcceefc24048056"
 dependencies = [
  "clap",
  "image",

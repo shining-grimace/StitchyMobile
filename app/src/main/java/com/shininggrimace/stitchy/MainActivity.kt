@@ -7,6 +7,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.shininggrimace.stitchy.databinding.ActivityMainBinding
+import java.nio.ByteBuffer
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         @JvmStatic
         external fun runStitchy(
             config: String,
-            inputFds: IntArray,
+            inputBuffers: Array<ByteBuffer>,
             inputMimeTypes: Array<String>,
             outputFd: Int,
             outputMimeType: String
