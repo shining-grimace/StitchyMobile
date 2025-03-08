@@ -9,33 +9,17 @@ import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.channels.FileChannel
 
 class OpenedInputFiles private constructor(
-    private val resources: OpenResources,
+    val buffers: Array<ByteBuffer>,
     val mimeTypes: Array<String>
 ) {
-    private class OpenResources(
-        val streams: MutableList<FileInputStream> = mutableListOf(),
-        val channels: MutableList<FileChannel> = mutableListOf(),
-        val buffers: MutableList<ByteBuffer> = mutableListOf()
-    ) {
-        fun close() {
-            for (channel in channels) {
-                channel.close()
-            }
-            for (stream in streams) {
-                stream.close()
-            }
-        }
-    }
-
     companion object {
 
         @SuppressLint("Recycle")
         fun fromPaths(context: Context, uris: List<Uri>): Result<OpenedInputFiles> {
 
-            val openResources = OpenResources()
+            val buffers = mutableListOf<ByteBuffer>()
             val mimes = mutableListOf<String>()
 
             val resolver = context.contentResolver
@@ -49,18 +33,17 @@ class OpenedInputFiles private constructor(
                         streamToDirectBuffer(inputStream)
                     }
                     mimes.add(mime)
-                    openResources.buffers.add(buffer)
+                    buffers.add(buffer)
                 }
             } catch (e: Exception) {
                 Timber.e(e)
-                openResources.close()
                 return Result.failure(Exception(
                     context.getString(R.string.error_accessing_files)))
             }
 
             return Result.success(
                 OpenedInputFiles(
-                    openResources,
+                    buffers.toTypedArray(),
                     mimes.toTypedArray()
                 ))
         }
@@ -77,13 +60,5 @@ class OpenedInputFiles private constructor(
             buffer.rewind()
             return buffer
         }
-    }
-
-    fun getBuffers(): Array<ByteBuffer> {
-        return resources.buffers.toTypedArray()
-    }
-
-    fun closeAll() {
-        resources.close()
     }
 }

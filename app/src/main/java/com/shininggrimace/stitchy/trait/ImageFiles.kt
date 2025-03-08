@@ -87,12 +87,11 @@ interface ImageFiles {
         onStitchBegin(inputOptionsJson)
         val errorMessage = MainActivity.runStitchy(
             inputOptionsJson,
-            inputResources.getBuffers(),
+            inputResources.buffers,
             inputResources.mimeTypes,
             outputFd,
             config.getMimeType()
         ) ?: run {
-            inputResources.closeAll()
             if (isActive) {
                 viewModel.postOutputState(
                     ImagesViewModel.ProcessingState.Completed,
@@ -101,8 +100,6 @@ interface ImageFiles {
             }
             return@launch
         }
-
-        inputResources.closeAll()
 
         // Check if cancelled
         if (!isActive) {
