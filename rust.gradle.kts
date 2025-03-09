@@ -5,7 +5,7 @@ tasks.register<Exec>("cargoBuildAarch64") {
         "cargo",
         "build",
         "--target",
-        "x86_64-linux-android",
+        "aarch64-linux-android",
         "--release",
         "--manifest-path",
         "rust/Cargo.toml"
@@ -18,7 +18,7 @@ tasks.register<Exec>("cargoBuildX86_64") {
         "cargo",
         "build",
         "--target",
-        "aarch64-linux-android",
+        "x86_64-linux-android",
         "--release",
         "--manifest-path",
         "rust/Cargo.toml"
