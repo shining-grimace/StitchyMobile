@@ -6,7 +6,7 @@ import android.net.Uri
 import com.shininggrimace.stitchy.R
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
-import java.io.FileInputStream
+import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -27,9 +27,9 @@ class OpenedInputFiles private constructor(
                 for (uri in uris) {
                     val mime = resolver.getType(uri)
                         ?: throw Exception("Error checking MIME type")
-                    val fd = resolver.openFileDescriptor(uri, "r")?.fileDescriptor
+                    val stream = resolver.openInputStream(uri)
                         ?: throw Exception("Error opening an input file")
-                    val buffer = FileInputStream(fd).use { inputStream ->
+                    val buffer = stream.use { inputStream ->
                         streamToDirectBuffer(inputStream)
                     }
                     mimes.add(mime)
@@ -48,9 +48,8 @@ class OpenedInputFiles private constructor(
                 ))
         }
 
-        private fun streamToDirectBuffer(inputStream: FileInputStream): ByteBuffer {
-            val size = inputStream.channel.size().toInt()
-            val bytes = ByteArrayOutputStream(size).use { bufferStream ->
+        private fun streamToDirectBuffer(inputStream: InputStream): ByteBuffer {
+            val bytes = ByteArrayOutputStream(0).use { bufferStream ->
                 inputStream.copyTo(bufferStream).toInt()
                 bufferStream.toByteArray()
             }
