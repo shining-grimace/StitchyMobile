@@ -1,13 +1,14 @@
 
-### Unreleased
+### 1.0.2 (March 10, 2025)
 
-- Update `stitchy-core` dependency to 0.1.4, which brings these updates:
+- Update `stitchy-core` dependency from 0.1.2 to 0.1.5, which brings these updates:
   - Fixed more failures to process files
   - Apply rotation metadata so images are oriented correctly (JPEG and WebP)
 - Support WebP (lossless only)
 - Add 'small mode' that encodes the smallest file possible (at the expense of speed); applies only
   to PNG and GIF
 - Add 'fast mode' that uses nearest-neighbour filtering when copying files (fast but lower quality)
+- Fixed failure to open images containing private metadata on Android 12+
 
 ### 1.0.1 (May 11, 2024)
 
