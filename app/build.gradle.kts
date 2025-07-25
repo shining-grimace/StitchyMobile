@@ -1,5 +1,12 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
+}
 
 plugins {
     id("com.android.application")
@@ -8,12 +15,12 @@ plugins {
 
 android {
     namespace = "com.shininggrimace.stitchy"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.shininggrimace.stitchy"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 5
         versionName = "1.0.2"
     }
@@ -46,9 +53,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -56,11 +60,11 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("com.google.android.material:material:1.13.0-alpha11")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.8")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.8")
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("com.google.android.material:material:1.13.0-beta01")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.2")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.2")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
     implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("io.coil-kt.coil3:coil:3.1.0")
+    implementation("io.coil-kt.coil3:coil:3.3.0")
 }
