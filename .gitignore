@@ -3,4 +3,4 @@
 .gradle/
 /local.properties
 /*.log
-
+/build/
