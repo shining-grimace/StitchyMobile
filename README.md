@@ -13,7 +13,7 @@ configuration options similar to the Stitchy CLI.
 #### Development
 
 Contributions to the underlying Stitchy crates are welcome. Please find
-[that repository on GitHub](https://github.com/grimace87/Stitchy).
+[that repository on GitHub](https://github.com/shining-grimace/Stitchy).
 
 Building this Android app has only been tested on an Ubuntu Linux machine, and is set up with some host-specific
 configuration. If you would like to run this on your machine, you will need to set up some things:
